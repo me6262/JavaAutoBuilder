@@ -24,6 +24,8 @@ dependencies {
     // This dependency is used by the application.
     implementation("com.github.bailuk:java-gtk:0.3.0")
     implementation("com.google.guava:guava:31.1-jre")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
+
 }
 
 application {

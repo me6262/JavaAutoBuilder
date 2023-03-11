@@ -13,6 +13,7 @@ public class AutoPicker {
 
     public AutoPicker() {
 
+        AmodeCommandsWidget amodeCommandsWidget = new AmodeCommandsWidget();
         flap = new Flap();
 
         Box flapBox = new Box(Orientation.VERTICAL, 0);
@@ -36,25 +37,15 @@ public class AutoPicker {
         flap.setModal(true);
         PreferencesPage amodes = new PreferencesPage();
         var rows1 = new PreferencesGroup();
-        var row1 = new ActionRow();
-        row1.setTitle("asdfghjk");
-        var row2 = new ActionRow();
-        row2.setTitle("asdfghjk");
-        var row3 = new ActionRow();
-        row3.setTitle("asdfghjk");
-        var row4 = new ActionRow();
-        row4.setTitle("asdfghjk");
-        var row5 = new ActionRow();
-        row5.setTitle("asdfghjk");
-        rows1.add(row1);
-        rows1.add(row2);
-        rows1.add(row3);
-        rows1.add(row4);
-        rows1.add(row5);
+
         amodes.add(rows1);
 
 
         PreferencesGroup amodeGroup = new PreferencesGroup();
+        amodeGroup.setMarginBottom(10);
+        amodeGroup.setMarginEnd(10);
+        amodeGroup.setMarginStart(10);
+        amodeGroup.setMarginTop(10);
         ActionRow preferencesRow = new ActionRow();
         preferencesRow.setTitle("Tejzhjkhdfajhsdfjst");
         preferencesRow.setTitleLines(1);
@@ -81,17 +72,15 @@ public class AutoPicker {
         flapBox.append(label4);
         flapBox.setVexpand(true);
 //        flapBox.setHexpand(true);
-        vbox.append(new Button());
         vbox.append(amodeGroup);
         amodeGroup.setHexpand(false);
 //        amodeFrame.setChild(flapBox);
         bin.setChild(vbox);
         flap.setFlap(bin);
-        flap.setContent(amodes);
+        flap.setContent(amodeCommandsWidget.getWidget());
 
         flap.setHexpand(true);
 
-        flap.setRevealFlap(false);
         Separator sep = new Separator(Orientation.VERTICAL);
 //        flap.setSeparator(sep);
         flap.setSwipeToClose(true);
