@@ -2,34 +2,38 @@ package java238.widgets;
 
 import ch.bailu.gtk.gio.File;
 import ch.bailu.gtk.gtk.*;
+import ch.bailu.gtk.type.Str;
+import java238.App;
 
 public class LoadFileDialog {
-    private Dialog dialog;
     private FileChooser chooserInterface;
-    File currentProjectFolder;
+    Str currentProjectFolder;
     FileChooserDialog chooser;
-    FileChooserWidget widget;
-
-    public LoadFileDialog() {
-        dialog = new Dialog();
-        widget = new FileChooserWidget(FileChooserAction.SELECT_FOLDER);
-//        dialog.setChild();
-        chooserInterface = new FileChooser(dialog.cast());
-//        chooser = new FileChooserDialog(chooserInterface.cast());
-    }
+    public LoadFileDialog() {}
 
     public void loadFolder() {
 
-        dialog.onResponse(this::onResponse);
 
-        dialog.show();
+        chooser = new FileChooserDialog("Stuff", App.window, FileChooserAction.SELECT_FOLDER, "Open",ResponseType.ACCEPT, null);
+        chooserInterface = new FileChooser(chooser.cast());
+//        widget = new FileChooserWidget(chooserInterface.cast());
+        chooser.onResponse(this::onResponse);
+        chooser.show();
+//        chooser.response(ResponseType.ACCEPT);
 
     }
 
     private void onResponse(int responseID) {
-        if (responseID == ResponseType.OK) {
-            currentProjectFolder = chooserInterface.getCurrentFolder();
+        System.out.println("WOAHAHAAHHH");
+        System.out.println(responseID);
+        if (responseID == ResponseType.ACCEPT) {
+            currentProjectFolder =chooserInterface.getCurrentFolder().getParseName();
+            System.out.println(currentProjectFolder);
+            chooser.destroy();
+        } else  {
+            System.out.println("NOPE_______");
         }
+
     }
 
 }
