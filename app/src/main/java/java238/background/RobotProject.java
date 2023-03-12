@@ -29,7 +29,8 @@ public class RobotProject {
     }
 
     public RobotProject() {
-
+        mapper = new ObjectMapper();
+        mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
     }
 
     public void setRootDirectory(String rootDirectory) {

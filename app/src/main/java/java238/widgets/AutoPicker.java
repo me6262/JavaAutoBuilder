@@ -4,18 +4,23 @@ import ch.bailu.gtk.adw.*;
 import ch.bailu.gtk.gdk.Rectangle;
 import ch.bailu.gtk.gtk.*;
 import java238.App;
+import java238.background.AmodeCommandList;
+import java238.background.AmodeList;
+import org.checkerframework.checker.units.qual.A;
 
 import javax.swing.text.Position;
+import java.util.List;
 
 public class AutoPicker {
     public Flap flap;
     public ListBox modes;
+    PreferencesGroup amodeGroup;
+    AmodeCommandsWidget amodeCommandsWidget;
 
     public AutoPicker() {
 
-        AmodeCommandsWidget amodeCommandsWidget = new AmodeCommandsWidget();
+        amodeCommandsWidget = new AmodeCommandsWidget();
         flap = new Flap();
-
         Box flapBox = new Box(Orientation.VERTICAL, 0);
         Box vbox = new Box(Orientation.VERTICAL, 0);
         var bin = new Bin();
@@ -41,28 +46,13 @@ public class AutoPicker {
         amodes.add(rows1);
 
 
-        PreferencesGroup amodeGroup = new PreferencesGroup();
+        amodeGroup = new PreferencesGroup();
         amodeGroup.setMarginBottom(10);
         amodeGroup.setMarginEnd(10);
         amodeGroup.setMarginStart(10);
         amodeGroup.setMarginTop(10);
-        ActionRow preferencesRow = new ActionRow();
-        preferencesRow.setTitle("Tejzhjkhdfajhsdfjst");
-        preferencesRow.setTitleLines(1);
-        preferencesRow.setHeader(new Label("jhajkhakjlf"));
-        ActionRow preferencesRow2 = new ActionRow();
-        preferencesRow2.setTitle("Tejzhjkhdfajhsdfjst");
-        preferencesRow2.setTitleLines(1);
-        preferencesRow2.setHeader(new Label("jhajkhakjlf"));
-        ActionRow preferencesRow3 = new ActionRow();
-        preferencesRow3.setTitle("Tejzhjkhdfajhsdfjst");
-        preferencesRow3.setTitleLines(1);
-        preferencesRow3.setHeader(new Label("jhajkhakjlf"));
         amodeGroup.setTitle("test");
         amodeGroup.setDescription("a lot of words here so i can try stuff");
-        amodeGroup.add(preferencesRow);
-        amodeGroup.add(preferencesRow2);
-        amodeGroup.add(preferencesRow3);
 
 
         System.out.println(flap.getFlapPosition());
@@ -85,6 +75,29 @@ public class AutoPicker {
 //        flap.setSeparator(sep);
         flap.setSwipeToClose(true);
         flap.setSwipeToOpen(true);
+
+    }
+
+    public void setModes(List<AmodeList> list) {
+        for (AmodeList modeList : list) {
+            setMode(modeList);
+        }
+        App.window.present();
+        flap.show();
+    }
+
+    public void setMode(AmodeList list) {
+        ActionRow row = new ActionRow();
+        Button editButton = new Button();
+        editButton.setIconName("document-edit-symbolic");
+        row.setTitle(list.getName());
+        row.setActivatable(true);
+        row.onActivate(() -> {
+            amodeCommandsWidget.setAuto(list);
+
+        });
+        row.addSuffix(editButton);
+        amodeGroup.add(row);
 
     }
 
