@@ -33,7 +33,7 @@ public class App {
     }
 
     public static void onStartup() {
-        StyleManager.getDefault().setColorScheme(ColorScheme.FORCE_LIGHT);
+//        StyleManager.getDefault().setColorScheme(ColorScheme.FORCE_LIGHT);
     }
 
     public static void main(String[] args) {
@@ -44,7 +44,7 @@ public class App {
         picker = new AutoPicker();
         app.onStartup(App::onStartup);
         app.onActivate(() -> {
-        StyleManager.getDefault().setColorScheme(ColorScheme.FORCE_DARK);
+            StyleManager.getDefault().setColorScheme(ColorScheme.FORCE_DARK);
             var header = new HeaderBar();
             var toggleFlap = new Button();
             var load = new Button();

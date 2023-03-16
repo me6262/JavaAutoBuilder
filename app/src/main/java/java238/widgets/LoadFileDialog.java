@@ -11,11 +11,11 @@ import org.checkerframework.checker.units.qual.A;
 public class LoadFileDialog {
     private FileChooser chooserInterface;
     String currentProjectFolder;
-    FileChooserDialog chooser;
+    FileChooserNative chooser;
     public LoadFileDialog() {}
 
     public void loadFolder() {
-        chooser = new FileChooserDialog("Stuff", App.window, FileChooserAction.SELECT_FOLDER, "Open",ResponseType.ACCEPT, null);
+        chooser = new FileChooserNative("Stuff", App.window, FileChooserAction.SELECT_FOLDER, "Open", "Cancel");
         chooserInterface = new FileChooser(chooser.cast());
         chooser.onResponse(this::onResponse);
         File startPath = File.newForPath(new Str("~/"));

@@ -1,33 +1,28 @@
 package java238.widgets;
 
-import ch.bailu.gtk.adw.Bin;
 import ch.bailu.gtk.adw.PreferencesGroup;
-import ch.bailu.gtk.adw.StatusPage;
 import ch.bailu.gtk.gtk.*;
 import java238.background.AmodeCommandList;
 import java238.background.AmodeList;
 
-public class AmodeCommandsWidget extends Bin {
+public class AmodeEditorWidget extends ScrolledWindow {
 
     PreferencesGroup amodeCommands;
-    private StatusPage noAuto = new StatusPage();
-    public AmodeCommandsWidget() {
+    private String modeName;
+    private String modeTitle;
+
+
+    public String getModeName() {
+        return modeName;
+    }
+    public AmodeEditorWidget(AmodeList commandList) {
         super();
-        noAuto.setTitle("No Auto Selected Yet");
-        noAuto.setDescription("You can open one from the left sidebar");
-        noAuto.setIconName("system-help-symbolic");
-        setNoneSelected();
-    }
-
-    public Widget getWidget() {
-        return this;
-    }
-
-    public void setNoneSelected() {
-        setChild(noAuto);
+        setAuto(commandList);
+        modeName = commandList.getName();
     }
 
     public void setAuto(AmodeList commandList) {
+
 
         amodeCommands = new PreferencesGroup();
         amodeCommands.setMarginTop(20);
@@ -38,15 +33,11 @@ public class AmodeCommandsWidget extends Bin {
         amodeCommands.setDescription("Edit This Auto");
 
         for (AmodeCommandList command: commandList.getCommands()) {
-            ListBoxRow row = new ListBoxRow();
-            var rowButton = new Button();
-            rowButton.setLabel(command.getName());
-            row.setChild(rowButton);
+            AutoCommandRow row = new AutoCommandRow();
+            row.setParameterFields(command);
             amodeCommands.add(row);
-
         }
         setChild(amodeCommands);
-
 
     }
 }
