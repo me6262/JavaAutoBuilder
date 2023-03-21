@@ -4,19 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AmodeList {
-    private String name;
-    public String getName(){
-        return name;
+    private List<Amode> AutonomousModes = new ArrayList<Amode>();
+    public List<Amode> getAutonomousModes(){
+        return AutonomousModes;
     }
-    public void setName(String val){
-        this.name = val;
+    public void setAutonomousModes(ArrayList<Amode> val){
+        AutonomousModes = val;
     }
 
-    private List<AmodeCommandList> commands = new ArrayList<AmodeCommandList>();
-    public List<AmodeCommandList> getCommands(){
-        return commands;
-    }
-    public void setCommands(ArrayList<AmodeCommandList> val){
-        commands = val;
-    }
 }

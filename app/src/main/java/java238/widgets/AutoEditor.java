@@ -1,7 +1,7 @@
 package java238.widgets;
 
 import ch.bailu.gtk.adw.PreferencesGroup;
-import java238.background.AmodeList;
+import java238.background.Amode;
 
 public class AutoEditor extends PreferencesGroup {
 
@@ -13,7 +13,7 @@ public class AutoEditor extends PreferencesGroup {
 
     }
 
-    public void setAutoSelected(AmodeList list) {
+    public void setAutoSelected(Amode list) {
 
     }
 }

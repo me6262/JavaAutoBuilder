@@ -5,8 +5,6 @@ import ch.bailu.gtk.gtk.*;
 import ch.bailu.gtk.type.Str;
 import ch.bailu.gtk.type.exception.AllocationError;
 import java238.App;
-import java238.background.RobotProject;
-import org.checkerframework.checker.units.qual.A;
 
 public class LoadFileDialog {
     private FileChooser chooserInterface;
@@ -36,7 +34,7 @@ public class LoadFileDialog {
             App.project.setRootDirectory(currentProjectFolder);
             App.project.loadRobotProject();
             chooser.destroy();
-            App.setAutoList();
+            App.initAutoList();
         }
 
     }

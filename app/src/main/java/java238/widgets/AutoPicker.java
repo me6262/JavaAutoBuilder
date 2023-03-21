@@ -3,14 +3,14 @@ package java238.widgets;
 import ch.bailu.gtk.adw.*;
 import ch.bailu.gtk.gtk.*;
 import java238.App;
-import java238.background.AmodeList;
+import java238.background.Amode;
 
 import java.util.List;
 
 public class AutoPicker {
     public Flap flap;
-    StackSidebar sidebar;
-    AmodeStack stack;
+    public StackSidebar sidebar;
+    public AmodeStack stack;
 
     public AutoPicker() {
 
@@ -47,18 +47,20 @@ public class AutoPicker {
 
     }
 
-    public void setModes(List<AmodeList> list) {
-        for (AmodeList modeList : list) {
-            setMode(modeList);
+    public void setModes(List<Amode> list) {
+        for (Amode modeList : list) {
+            setMode((Amode) modeList);
         }
         App.window.present();
         flap.show();
     }
 
-    public void setMode(AmodeList list) {
+    public void setMode(Amode list) {
         AmodeEditorWidget widget = new AmodeEditorWidget(list);
-        stack.addTitled(widget, widget.getModeName(), widget.getModeName());
+        stack.addTitled(widget, widget.getModeName());
     }
+
+
 
     public void onOpenClicked() {
 

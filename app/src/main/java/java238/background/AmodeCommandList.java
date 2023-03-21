@@ -3,7 +3,7 @@ package java238.background;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AmodeCommandList {
+public class AmodeCommandList{
     private String name;
     public String getName(){
         return name;
