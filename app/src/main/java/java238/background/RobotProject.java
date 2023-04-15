@@ -27,6 +27,7 @@ public class RobotProject {
     private String jsonString;
     private static AmodeList amodesList;
     private static List<CommandInfo> commands = new ArrayList<>();
+    private ArrayList<String> trajectories;
 
     public RobotProject(String rootDirectory) {
         this.rootDirectory = rootDirectory;
@@ -44,33 +45,53 @@ public class RobotProject {
         File dir = new File(rootDirectory + Constants.commandDirectory);
         File[] directoryListing = dir.listFiles();
 
-        if (directoryListing != null) {
-            for (File child : directoryListing) {
-                CommandInfo info;
-                String[] params;
-                Scanner scanner = new Scanner(child);
-                var line = scanner.nextLine();
-                // Do something with child
-                while (scanner.hasNextLine()) {
-                    line = scanner.nextLine();
-                    var findPattern = scanner.findInLine(pattern);
-                    if (findPattern != null) {
-                        params = findPattern.substring(44, findPattern.length() - 2).split(", ");
-                        info = new CommandInfo(child.getName().substring(0, child.getName().length() - 5), params);
-                        System.out.println(info.getName() + " with parameters " + Arrays.toString(info.getParameters()).strip());
-                        commands.add(info);
-                        break;
-                    }
+        if (directoryListing == null)  return;
 
-                }
+        for (File child : directoryListing) {
+            CommandInfo info;
+            String[] params;
+            Scanner scanner = new Scanner(child);
+            var line = scanner.nextLine();
 
+            // Do something with child
+            while (scanner.hasNextLine()) {
+                line = scanner.nextLine();
+                var findPattern = scanner.findInLine(pattern);
+
+                if (findPattern == null) continue;
+
+                params = findPattern.substring(44, findPattern.length() - 2).split(", ");
+
+                ArrayList<String> paramsList = new ArrayList<>(params.length);
+                paramsList.addAll(Arrays.asList(params));
+
+                info = new CommandInfo(child.getName().substring(0, child.getName().length() - 5), paramsList);
+                commands.add(info);
+
+                System.out.println(info.getName() + " with parameters " + info.getParameters().toString().strip());
+                break;
 
             }
-            }
-
-
-
+        }
     }
+    public void indexTrajectories() {
+        trajectories = new ArrayList<>();
+        Pattern pattern = Pattern.compile(rootDirectory + Constants.deployDirectory + Constants.pathPlannerDir);
+        File dir = new File(rootDirectory + Constants.deployDirectory + Constants.pathPlannerDir);
+
+        File[] dirList = dir.listFiles();
+        assert dirList != null;
+        for (File child : dirList) {
+            System.out.println(child.getName());
+            trajectories.add(child.getName().split("\\.path")[0]);
+        }
+        System.out.println(trajectories);
+    }
+
+    public ArrayList<String> getTrajectories() {
+        return trajectories;
+    }
+
 
 
     public RobotProject() {
@@ -125,6 +146,10 @@ public class RobotProject {
         }
     }
 
+    public void tempSaveDraggedCommand () {
+
+    }
+
 
 
 
@@ -139,7 +164,7 @@ public class RobotProject {
 
     }
 
-        public static enum OSName {
+        public enum OSName {
             Unix,
             Windows
         }

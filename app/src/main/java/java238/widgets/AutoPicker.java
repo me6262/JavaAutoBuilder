@@ -11,20 +11,20 @@ public class AutoPicker {
     public Flap flap;
     public StackSidebar sidebar;
     public AmodeStack stack;
+    public CommandSidebar commandSidebar;
 
     public AutoPicker() {
 
+        commandSidebar = new CommandSidebar();
         flap = new Flap();
-        Box flapBox = new Box(Orientation.VERTICAL, 0);
         Box vbox = new Box(Orientation.VERTICAL, 0);
         var bin = new Bin();
-        Frame amodeFrame = new Frame("Long test to see if folding works properly lets keep going so i can test");
-
         sidebar = new StackSidebar();
         stack = new AmodeStack();
         sidebar.setStack(stack);
         flap.setFoldPolicy(FlapFoldPolicy.AUTO);
         flap.setVexpand(true);
+        commandSidebar.setContent(stack);
 
 
         flap.setFoldThresholdPolicy(FoldThresholdPolicy.NATURAL);
@@ -33,15 +33,13 @@ public class AutoPicker {
         flap.setLocked(true);
         flap.setModal(true);
 
-//        amodeFrame.setChild(flapBox);
         bin.setChild(vbox);
         flap.setFlap(sidebar);
-        flap.setContent(stack);
+        flap.setContent(commandSidebar);
 
         flap.setHexpand(true);
 
         Separator sep = new Separator(Orientation.VERTICAL);
-//        flap.setSeparator(sep);
         flap.setSwipeToClose(true);
         flap.setSwipeToOpen(true);
 
@@ -57,12 +55,12 @@ public class AutoPicker {
 
     public void setMode(Amode list) {
         AmodeEditorWidget widget = new AmodeEditorWidget(list);
-        stack.addTitled(widget, widget.getModeName());
+        stack.addTitled(widget, widget.modeName);
     }
 
 
 
-    public void onOpenClicked() {
+    public void onToggleClicked() {
 
         flap.setRevealFlap(!flap.getRevealFlap());
         App.window.present();

@@ -16,7 +16,7 @@ public class Amode {
     public List<AmodeCommandList> getCommands(){
         return commands;
     }
-    public void setCommands(ArrayList<AmodeCommandList> val){
+    public void setCommands(List<AmodeCommandList> val){
         commands = val;
     }
 }

@@ -7,18 +7,16 @@ import ch.bailu.gtk.type.exception.AllocationError;
 import java238.App;
 
 public class LoadFileDialog {
-    private FileChooser chooserInterface;
     String currentProjectFolder;
     FileChooserNative chooser;
     public LoadFileDialog() {}
 
     public void loadFolder() {
         chooser = new FileChooserNative("Stuff", App.window, FileChooserAction.SELECT_FOLDER, "Open", "Cancel");
-        chooserInterface = new FileChooser(chooser.cast());
         chooser.onResponse(this::onResponse);
         File startPath = File.newForPath(new Str("~/"));
         try {
-            chooserInterface.setCurrentFolder(startPath);
+            chooser.asFileChooser().setCurrentFolder(startPath);
         } catch (AllocationError e) {
             throw new RuntimeException(e);
         }
@@ -29,7 +27,7 @@ public class LoadFileDialog {
     private void onResponse(int responseID) {
         System.out.println(responseID);
         if (responseID == ResponseType.ACCEPT) {
-            currentProjectFolder = chooserInterface.getCurrentFolder().getParseName().toString();
+            currentProjectFolder = chooser.asFileChooser().getCurrentFolder().getParseName().toString();
             System.out.println(currentProjectFolder);
             App.project.setRootDirectory(currentProjectFolder);
             App.project.loadRobotProject();

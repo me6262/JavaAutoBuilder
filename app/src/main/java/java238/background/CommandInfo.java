@@ -1,10 +1,12 @@
 package java238.background;
 
+import java.util.ArrayList;
+
 public class CommandInfo {
     private String name;
-    private String[] parameters;
+    private ArrayList<String> parameters;
 
-    public CommandInfo(String name, String[] parameters) {
+    public CommandInfo(String name, ArrayList<String> parameters) {
         this.name = name;
         this.parameters = parameters;
     }
@@ -16,7 +18,7 @@ public class CommandInfo {
         return name;
     }
 
-    public String[] getParameters() {
+    public ArrayList<String> getParameters() {
         return parameters;
     }
 
@@ -24,7 +26,7 @@ public class CommandInfo {
         this.name = name;
     }
 
-    public void setParameters(String[] parameters) {
+    public void setParameters(ArrayList<String> parameters) {
         this.parameters = parameters;
     }
 }

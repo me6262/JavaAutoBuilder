@@ -1,13 +1,18 @@
 package java238.widgets;
 
-import ch.bailu.gtk.adw.ActionRow;
-import ch.bailu.gtk.adw.ComboRow;
-import ch.bailu.gtk.adw.ExpanderRow;
-import ch.bailu.gtk.adw.PreferencesRow;
-import ch.bailu.gtk.gio.ListModel;
+import ch.bailu.gtk.adw.*;
+import ch.bailu.gtk.gdk.ContentProvider;
+import ch.bailu.gtk.gdk.Drag;
+import ch.bailu.gtk.gdk.Gdk;
+import ch.bailu.gtk.gdk.Paintable;
+import ch.bailu.gtk.gdkpixbuf.Pixbuf;
+import ch.bailu.gtk.gio.*;
+import ch.bailu.gtk.gobject.TypeFlags;
 import ch.bailu.gtk.gtk.*;
+import ch.bailu.gtk.type.PointerContainer;
 import ch.bailu.gtk.type.Str;
 import ch.bailu.gtk.type.Strs;
+import ch.bailu.gtk.type.Type;
 import java238.App;
 import java238.background.AmodeCommandList;
 import java238.background.CommandInfo;
@@ -22,17 +27,49 @@ public class AutoCommandRow extends ExpanderRow {
 
     AmodeCommandList command;
     HashMap<String, Supplier<Str>> parametersMap = new HashMap<>();
+    CommandInfo info;
+    private int modeIndex;
+    DragSource dnd;
+    DropTarget target;
 
-    public AutoCommandRow() {
+
+    enum ParallelType {
+        Parallel,
+        Race,
+        Deadline_Leader,
+        Deadline_Follower,
+        None
+    }
+
+
+    public AutoCommandRow(int i) {
         super();
+        modeIndex = i;
+        setFocusable(true);
+        setFocusOnClick(true);
+        dnd = new DragSource();
+        addController(dnd);
+        dnd.onDragBegin(this::onDragBegin);
+        dnd.onPrepare(this::onPrepare);
+    }
+
+
+
+
+    public AutoCommandRow getSelf() {
+        return this;
+    }
+
+    public int getModeIndex() {
+        return modeIndex;
     }
 
     public void setParameterFields(AmodeCommandList commandList) {
         command = commandList;
 
+        setName(commandList.getName());
         setTitle(commandList.getName());
         var commands = App.project.getCommands();
-        CommandInfo info = null;
 
         for (CommandInfo commandInfo : commands) {
             if (commandInfo.getName().equals(commandList.getName())) {
@@ -42,21 +79,43 @@ public class AutoCommandRow extends ExpanderRow {
 
         List<String> parameters = commandList.getParameters();
         for (int i = 0; i < parameters.size(); i++) {
+
             String parameter = parameters.get(i);
-            ActionRow entryRow = new ActionRow();
+            EntryRow entryRow = new EntryRow();
+
             assert info != null;
-            entryRow.setTitle(info.getParameters()[i].strip().substring(1, info.getParameters()[i].strip().length() - 1));
+            if (info.getParameters().size() <= 1) continue;
 
+            String[] paramName = info.getParameters().get(i).strip().split("\"");
+            entryRow.setTitle(paramName.length == 1 ? paramName[0] : paramName[1]);
 
+            if (!info.getParameters().get(i).contains("TrajectoryName")) {
+                Entry entry = new Entry();
+                entryRow.asEditable().setText(parameter);
+                parametersMap.put(paramName.length == 1 ? paramName[0] : paramName[1], entryRow.asEditable()::getText);
+                addRow(entryRow);
 
-            Entry entry = new Entry();
-            entry.setPlaceholderText(parameter);
-            addRow(entryRow);
-            entry.setBuffer(new EntryBuffer(parameter, parameter.length()));
-            entryRow.addSuffix(entry);
-            entryRow.setActivatableWidget(entry);
-            parametersMap.put(info.getParameters()[i].strip().substring(1, info.getParameters()[i].strip().length() - 1), entry.getBuffer()::getText);
+            } else {
+                var actionRow = new ActionRow();
+                ComboBoxText trajectoryName = ComboBoxText.newWithEntryComboBoxText();
+                var trajectories = App.project.getTrajectories();
 
+                for (int j = 0; j < trajectories.size(); j++) {
+                    trajectoryName.appendText(trajectories.get(j));
+
+                    if (trajectories.get(j).equals(parameter)) {
+                        trajectoryName.setActiveId(trajectories.get(j));
+                        trajectoryName.setActive(j);
+                    }
+
+                    parametersMap.put(paramName.length == 1 ?
+                                paramName[0] : paramName[1],
+                                trajectoryName::getActiveText);
+                }
+                actionRow.addSuffix(trajectoryName);
+
+                addRow(actionRow);
+            }
         }
         ParallelType type = ParallelType.valueOf(commandList.getParallelType());
         ComboBoxText comboBoxText = new ComboBoxText();
@@ -79,20 +138,19 @@ public class AutoCommandRow extends ExpanderRow {
         comboBoxText.setSensitive(true);
         parametersMap.put("ParallelType", comboBoxText::getActiveText);
         addRow(parallelRow);
-
-
     }
+
 
     public AmodeCommandList getUpdatedCommandList() {
         ArrayList<String> parameters = new ArrayList<>();
-        for (String param : parametersMap.keySet()) {
-            if (param.equals("ParallelType")) {
-                command.setParallelType(parametersMap.get(param).get().toString());
-                continue;
+        if (info.getParameters().size() > 1) {
+            for (int i = 0; i < info.getParameters().size(); i++) {
+                if (parametersMap.get(info.getParameters().get(i).strip().split("\"")[1]).get() != null) {
+                    parameters.add(parametersMap.get(info.getParameters().get(i).strip().split("\"")[1]).get().toString());
+                }
             }
-            if (parametersMap.get(param).get() != null) {
-                parameters.add(parametersMap.get(param).get().toString());
-            }
+
+            command.setParallelType(parametersMap.get("ParallelType").get().toString());
         }
 
         command.setParameters(parameters);
@@ -100,16 +158,22 @@ public class AutoCommandRow extends ExpanderRow {
         return command;
     }
 
+
     public AmodeCommandList getCommand() {
         return command;
     }
 
-    enum ParallelType {
-        Parallel,
-        Race,
-        Deadline_Leader,
-        Deadline_Follower,
-        None
+    private void onDragBegin(Drag drag) {
+        Paintable paintable = new Paintable(new PointerContainer(this.asCPointer()));
+        File file = File.newForPath(new Str("/home/haydenm/IdeaProjects/JavaAutoBuilder/app/src/main/resources/icons.png"));
+        IconPaintable paint = IconPaintable.newForFileIconPaintable(file, 240, 2);
+        dnd.setIcon(paint.asPaintable(), 0, 0);
+    }
+
+    private ContentProvider onPrepare(double v, double v1) {
+        File file = File.newForPath(new Str("src/main/resources/currentCommand.json"));
+
+        return ContentProvider.newTypedContentProvider(File.getTypeID(), file.asCPointer());
     }
 
 }
