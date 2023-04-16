@@ -7,6 +7,7 @@ import ch.bailu.gtk.gdk.Gdk;
 import ch.bailu.gtk.gio.ApplicationFlags;
 import ch.bailu.gtk.gtk.*;
 import ch.bailu.gtk.gtk.Application;
+import ch.bailu.gtk.lib.bridge.CSS;
 import ch.bailu.gtk.type.Pointer;
 import ch.bailu.gtk.type.PointerContainer;
 import ch.bailu.gtk.type.Str;
@@ -44,7 +45,8 @@ public class App {
         init();
         header = new HeaderBar();
         picker = new AutoPicker();
-        Strs accels = new Strs(new Str[]{new Str("Control+h")});
+
+        Strs accels = new Strs(new Str[]{new Str("<Ctrl>+h")});
         System.out.println(Gdk.keyvalFromName(new Str("<Control>h")));
 
         System.out.println(Gdk.keyvalName(16777215));

@@ -16,17 +16,18 @@ import java.util.function.Supplier
 
 class AmodeEditorWidget(commandList: Amode) : Bin() {
     private var focusedCommandName: String? = null
-    var amodeCommands: ListBox? = null
-    private var settings: PreferencesGroup? = null
+    private var amodeCommands: ListBox = ListBox()
     private var amodeCommandListMap = ArrayList<Supplier<AutoCommandRow>>()
+
     @JvmField
     val modeName: String
-    private var mode: Amode? = null
-    var target: DropTarget
+    private lateinit var mode: Amode
+    private var target: DropTarget
     val self: AmodeEditorWidget
         get() = this
 
     init {
+        asAccessible()
         setAuto(commandList)
         modeName = commandList.name
         setName(modeName)
@@ -35,31 +36,27 @@ class AmodeEditorWidget(commandList: Amode) : Bin() {
         addController(target)
     }
 
-    val updatedMode: Amode?
+    val updatedMode: Amode
         get() {
             val modeList = ArrayList<AmodeCommandList>()
             for (amodeCommandListSupplier in amodeCommandListMap) {
-                modeList.add(amodeCommandListSupplier.get().updatedCommandList)
+                amodeCommandListSupplier.get().updatedCommandList?.let { modeList.add(it) }
             }
-            mode!!.commands = modeList
+            mode.commands = modeList
             return mode
         }
 
     fun setAuto(commandList: Amode) {
         focusOnClick = true
         mode = commandList
-        settings = PreferencesGroup()
-        amodeCommands = ListBox()
-        amodeCommands!!.onMoveFocus { handler: Int ->
+        amodeCommands.onMoveFocus { handler: Int ->
             println(focusChild.name.toString())
             focusedCommandName = focusChild.name.toString()
         }
-        amodeCommands!!.marginTop = 20
-        amodeCommands!!.marginEnd = 20
-        amodeCommands!!.marginStart = 20
-        amodeCommands!!.marginBottom = 20
-//        amodeCommands!!.setTi(commandList.name)
-//        amodeCommands!!.setDescription("Edit This Auto")
+        amodeCommands.marginTop = 20
+        amodeCommands.marginEnd = 20
+        amodeCommands.marginStart = 20
+        amodeCommands.marginBottom = 20
         for (i in commandList.commands.indices) {
             val row = AutoCommandRow(i)
             val delete = Button.newFromIconNameButton("user-trash-symbolic")
@@ -67,7 +64,7 @@ class AmodeEditorWidget(commandList: Amode) : Bin() {
             amodeCommandListMap.add(Supplier { row.self })
             row.addPrefix(delete)
             row.setParameterFields(commandList.commands[i])
-            amodeCommands!!.append(row)
+            amodeCommands.append(row)
         }
         child = amodeCommands
     }
@@ -77,7 +74,7 @@ class AmodeEditorWidget(commandList: Amode) : Bin() {
         command.parallelType = "None"
         command.setParameters(info.parameters)
         command.name = info.name
-        val newMode = mode!!.commands
+        val newMode = mode.commands
         newMode.add(command)
         val row = AutoCommandRow(amodeCommandListMap.size)
         amodeCommandListMap.add(Supplier { row.self })
@@ -85,31 +82,40 @@ class AmodeEditorWidget(commandList: Amode) : Bin() {
         val delete = Button.newFromIconNameButton("user-trash-symbolic")
         row.addPrefix(delete)
         delete.onClicked { removeCommand(row) }
-        amodeCommands!!.append(row)
-        mode!!.commands = newMode
+        amodeCommands.append(row)
+        mode.commands = newMode
     }
 
     fun removeCommand(row: AutoCommandRow) {
-        val newCommands = mode!!.commands
+        val newCommands = mode.commands
         newCommands.removeAt(row.modeIndex)
         amodeCommandListMap.removeAt(row.modeIndex)
         row.hide()
     }
 
+    /**
+     * grabs the currently selected row, copies it, deletes the old one, and inserts the new row above
+     */
     fun moveRowUp() {
-        var row: AutoCommandRow
-        //        System.out.println(name);
-        val name = amodeCommands!!.focusChild.name.toString()
-        for (autoCommandRowSupplier in amodeCommandListMap) {
-            if (autoCommandRowSupplier.get().name.toString() != name) continue
-            println("oh yeah")
-            row = autoCommandRowSupplier.get()
-            val rowUp = row.prevSibling
-            amodeCommands!!.remove(row)
-            row.insertBefore(amodeCommands!!, rowUp)
-            amodeCommandListMap.removeAt(row.modeIndex)
-            amodeCommandListMap.add(row.modeIndex - 1, Supplier { row.self })
+        val row = amodeCommands.selectedRow;
+        val index: Int = row.index
+        if (index == 0) return
+        val commlist = amodeCommandListMap[index].get().updatedCommandList
+        val newRow = AutoCommandRow(index - 1)
+        if (commlist != null) {
+            newRow.setParameterFields(commlist)
         }
+        val delete = Button.newFromIconNameButton("user-trash-symbolic")
+        newRow.addPrefix(delete)
+        delete.onClicked { removeCommand(newRow) }
+        amodeCommands.remove(amodeCommands.getRowAtIndex(index))
+        amodeCommands.insert(newRow, index - 1)
+        amodeCommandListMap.removeAt(index)
+        amodeCommandListMap.add(index - 1, newRow::self)
+        amodeCommands.activateOnSingleClick = true
+
+        println("aaaaaaaaaa")
+
     }
 
     private fun onDrop(value: Value, v: Double, v1: Double): Boolean {

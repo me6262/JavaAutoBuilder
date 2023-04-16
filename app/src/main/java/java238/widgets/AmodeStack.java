@@ -39,8 +39,7 @@ public class AmodeStack extends Stack {
         setVisibleChildName("none");
         var up = Button.newFromIconNameButton("go-up-symbolic");
         App.header.packEnd(up);
-//        var handler = connectSignal("GtkStack.move-up", moveFocusedCommandUp());
-//        System.out.println(handler.getDetailedSignal());
+        up.onClicked(this::moveFocusedCommandUp);
 
     }
 
@@ -91,12 +90,8 @@ public class AmodeStack extends Stack {
         addTitled(editor, "New Auto");
     }
 
-
-    public interface OnActivate extends com.sun.jna.Callback {
-        public void invoke(long check_button);
-    }
     public void moveFocusedCommandUp() {
-//        editorWidgetSupplier.get(getVisibleChild().getName().toString()).get().moveRowUp();
+        editorWidgetSupplier.get(getVisibleChild().getName().toString()).get().moveRowUp();
         System.out.println("WOAH");
     }
 }

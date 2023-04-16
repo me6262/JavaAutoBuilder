@@ -5,6 +5,7 @@ import ch.bailu.gtk.gtk.*;
 import ch.bailu.gtk.type.Str;
 import ch.bailu.gtk.type.exception.AllocationError;
 import java238.App;
+import java238.background.RobotProject;
 
 public class LoadFileDialog {
     String currentProjectFolder;
@@ -29,7 +30,7 @@ public class LoadFileDialog {
         if (responseID == ResponseType.ACCEPT) {
             currentProjectFolder = chooser.asFileChooser().getCurrentFolder().getParseName().toString();
             System.out.println(currentProjectFolder);
-            App.project.setRootDirectory(currentProjectFolder);
+            RobotProject.Companion.setRootDirectory(currentProjectFolder);
             App.project.loadRobotProject();
             chooser.destroy();
             App.initAutoList();
