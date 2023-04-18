@@ -38,7 +38,7 @@ public class CommandSidebar extends Flap {
     public void generateList() {
         for (CommandInfo info : commands) {
             ActionRow row = new ActionRow();
-            row.setTitle(info.getName());
+            row.setTitle(info.name);
             row.setActivatable(true);
             Button addButton = Button.newFromIconNameButton("list-add-symbolic");
             row.addPrefix(addButton);

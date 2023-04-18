@@ -20,7 +20,7 @@ import java.util.function.Supplier
 class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
     var command: AmodeCommandList? = null
     val parametersMap = HashMap<String, Supplier<Str?>>()
-    private var info: CommandInfo? = null
+    private lateinit var info: CommandInfo
     val dnd: DragSource = DragSource()
 
     internal enum class ParallelType {
@@ -28,7 +28,6 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
     }
 
     init {
-        CSS.addProvider(this, RobotProject.rootDirectory + "/src/main/resources/gtk.css")
         focusable = true
         focusOnClick = true
         selectable = true
@@ -56,19 +55,14 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
         for (i in parameters.indices) {
             val parameter = parameters[i]
             val entryRow = EntryRow()
-            assert(info != null)
-            if (info!!.parameters.size <= 1) continue
-            val paramName = info!!.parameters[i].strip().split("\"".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            if (info.parameters.size == 0) continue
+            val paramName = info.parameters[i]!!.strip().split("\"".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             entryRow.setTitle(if (paramName.size == 1) paramName[0] else paramName[1])
-            if (!info!!.parameters[i].contains("TrajectoryName")) {
-                val entry = Entry()
-                entryRow.asEditable().setText(parameter)
-                parametersMap[if (paramName.size == 1) paramName[0] else paramName[1]] = Supplier { entryRow.asEditable().text }
-                addRow(entryRow)
-            } else {
+            if (info.parameters[i]!!.contains("TrajectoryName")) {
                 val actionRow = ActionRow()
                 val trajectoryName = ComboBoxText.newWithEntryComboBoxText()
                 val trajectories = App.project.trajectories
+                actionRow.setTitle("Trajectory Name")
                 if (trajectories != null) {
                     for (j in trajectories.indices) {
                         trajectoryName.appendText(trajectories[j])
@@ -81,6 +75,39 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
                 }
                 actionRow.addSuffix(trajectoryName)
                 addRow(actionRow)
+            } else {
+                if (info.parameterClasses[i].isEnum) {
+                    val enumBoxText = ComboBoxText()
+                    val actionRow = ActionRow()
+                    val paramClass = info.parameterClasses[i]
+                    for (enumeration in info.parameterClasses[i].enumConstants) {
+                        enumBoxText.appendText(enumeration.toString())
+                        if (enumeration.toString() == parameter.uppercase()){
+                            enumBoxText.active = (enumeration as Enum<*>).ordinal
+                        }
+                    }
+                    actionRow.addSuffix(enumBoxText)
+                    actionRow.setTitle(entryRow.title)
+                    addRow(actionRow)
+                    parametersMap[if (paramName.size == 1) paramName[0] else paramName[1]] = Supplier { enumBoxText.activeText }
+                    continue
+
+                }
+                if (info.parameterClasses[i].typeName == "boolean") {
+                    val boolBoxText = ComboBoxText()
+                    val actionRow = ActionRow()
+                    boolBoxText.appendText("false")
+                    boolBoxText.appendText("true")
+                    boolBoxText.active = if (info.parameters[i]!!.lowercase() == "true") 1 else 0
+                    actionRow.addSuffix(boolBoxText)
+                    addRow(actionRow)
+                    actionRow.setTitle(entryRow.title)
+                    parametersMap[if (paramName.size == 1) paramName[0] else paramName[1]] = Supplier { boolBoxText.activeText }
+                    continue
+                }
+                entryRow.asEditable().setText(parameter)
+                parametersMap[if (paramName.size == 1) paramName[0] else paramName[1]] = Supplier { entryRow.asEditable().text }
+                addRow(entryRow)
             }
         }
         val type = ParallelType.valueOf(commandList.parallelType)
@@ -105,10 +132,10 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
     val updatedCommandList: AmodeCommandList?
         get() {
             val parameters = ArrayList<String>()
-            if (info!!.parameters.size > 1) {
-                for (i in info!!.parameters.indices) {
-                    if (parametersMap[info!!.parameters[i].strip().split("\"".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]]!!.get() != null) {
-                        parameters.add(parametersMap[info!!.parameters[i].strip().split("\"".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]]!!.get().toString())
+            if (info.parameters.size > 1) {
+                for (i in info.parameters.indices) {
+                    if (parametersMap[info.parameters[i]!!.strip().split("\"".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]]!!.get() != null) {
+                        parameters.add(parametersMap[info.parameters[i]!!.strip().split("\"".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]]!!.get().toString())
                     }
                 }
                 command!!.parallelType = parametersMap["ParallelType"]!!.get().toString()

@@ -10,11 +10,14 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.lang.reflect.Constructor
+import java.net.URL
+import java.net.URLClassLoader
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.*
+import java.util.Scanner
 import java.util.regex.Pattern
-import kotlin.jvm.internal.Intrinsics.Kotlin
+import kotlin.collections.ArrayList
 
 class RobotProject {
     private val mapper: ObjectMapper = ObjectMapper()
@@ -28,23 +31,43 @@ class RobotProject {
         val dir = File(rootDirectory + Constants.commandDirectory)
         val directoryListing = dir.listFiles() ?: return
         for (child in directoryListing) {
-            var info: CommandInfo
-            var params: Array<String?>
+            val info: CommandInfo
+            val params: Array<String?>
             val scanner = Scanner(child)
             var line = scanner.nextLine()
-
+            var commandConstructor : Constructor<*>? = null
+            var foundAnnotation: Boolean = false
+            var paramClasses = arrayListOf<Class<Any>>()
+            var findPattern:String? = null
             // Do something with child
             while (scanner.hasNextLine()) {
                 line = scanner.nextLine()
-                val findPattern = scanner.findInLine(pattern) ?: continue
-                params = findPattern.substring(44, findPattern.length - 2).split(", ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                val paramsList = ArrayList<String?>(params.size)
-                paramsList.addAll(params)
-                info = CommandInfo(child.name.substring(0, child.name.length - 5), paramsList)
-                Companion.commands.add(info)
-                println(info.name + " with parameters " + info.parameters.toString().strip())
-                break
+                findPattern = scanner.findInLine(pattern) ?: continue
+                foundAnnotation = true
             }
+            if (!foundAnnotation) continue
+
+            val name = child.name.substring(0, child.name.length - 5)
+
+            params = findPattern!!.substring(44, findPattern.length - 2).split(", ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+
+            val paramsList: ArrayList<String?> = params.toMutableList() as ArrayList<String?>
+            val urls: Array<URL> = Array(4){File("$rootDirectory/build/classes/java/main/").toURI().toURL()}
+            urls[1] =  File( "/home/haydenm/wpilib/2023/maven/edu/wpi/first/wpilibj/wpilibj-java/2023.4.2/wpilibj-java-2023.4.2.jar/").toURI().toURL()
+            urls[2] =  File( "/home/haydenm/wpilib/2023/maven/edu/wpi/first/wpilibNewCommands/wpilibNewCommands-java/2023.4.2/wpilibNewCommands-java-2023.4.2.jar/").toURI().toURL()
+            urls[3] =  File( "/home/haydenm/wpilib/2023/maven/edu/wpi/first/wpiutil/wpiutil-java/2023.4.2/wpiutil-java-2023.4.2.jar/").toURI().toURL()
+            val loader: ClassLoader = URLClassLoader(urls)
+            val loadedClass = loader.loadClass("frc.robot.commands.$name")
+            for (constructor in loadedClass.constructors) {
+                if (constructor.parameterCount == params.size) {
+                    commandConstructor = constructor
+
+                }
+            }
+            val parameterTypes: Array<Class<*>> = commandConstructor!!.parameterTypes
+            info = CommandInfo(name, paramsList, parameterTypes)
+            Companion.commands.add(info)
+            println(info.name + " with parameters " + info.parameters.toString().strip())
         }
     }
 
@@ -116,11 +139,10 @@ class RobotProject {
 
     companion object {
         lateinit var rootDirectory: String
-        val amodeBuilderDir =
         private var amodesList: AmodeList? = null
         private val commands: MutableList<CommandInfo> = ArrayList()
         val oSName: OSName
-            get() = if (System.getProperty("os.name").lowercase(Locale.getDefault()).contains("win")) OSName.Windows else OSName.Unix
+            get() = if (System.getProperty("os.name").lowercase().contains("win")) OSName.Windows else OSName.Unix
     }
 
 }
