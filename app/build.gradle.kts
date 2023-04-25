@@ -28,7 +28,9 @@ dependencies {
     implementation("com.github.bailuk:java-gtk:stage-SNAPSHOT")
     implementation("com.google.guava:guava:31.1-jre")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
+    implementation("com.googlecode.json-simple:json-simple:1.1.1")
     implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("reflect"))
 
 }
 

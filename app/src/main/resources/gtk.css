@@ -1,3 +1,12 @@
-AdwFlap:flap .background {
-    background-color: #303030;
+@define-color accent_bg_color @yellow_2;
+@define-color accent_fg_color @yellow_2;
+
+@define-color accent_color @yellow_2;
+.background {
+    background-color: @window_bg_color;
+    /*background: #242424;*/
+}
+
+.accent_color {
+
 }

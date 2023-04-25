@@ -6,9 +6,7 @@ import ch.bailu.gtk.adw.Flap;
 import ch.bailu.gtk.adw.FlapFoldPolicy;
 import ch.bailu.gtk.adw.FoldThresholdPolicy;
 import ch.bailu.gtk.adw.PreferencesGroup;
-import ch.bailu.gtk.gtk.Button;
-import ch.bailu.gtk.gtk.PositionType;
-import ch.bailu.gtk.gtk.ScrolledWindow;
+import ch.bailu.gtk.gtk.*;
 import java238.App;
 import java238.background.CommandInfo;
 
@@ -16,18 +14,19 @@ import java.util.List;
 
 public class CommandSidebar extends Flap {
     List<CommandInfo> commands;
-    PreferencesGroup commandsGroup;
+    ListBox commandsGroup;
     ScrolledWindow scrolledWindow;
-    Clamp clamp;
 
     public CommandSidebar() {
         commands = App.project.getCommands();
         scrolledWindow = new ScrolledWindow();
-        commandsGroup = new PreferencesGroup();
-        clamp = new Clamp();
-        clamp.setChild(commandsGroup);
-        scrolledWindow.setChild(clamp);
-        clamp.setMaximumSize(280);
+        commandsGroup = new ListBox();
+        scrolledWindow.setChild(commandsGroup);
+        scrolledWindow.setHexpand(false);
+        scrolledWindow.getVscrollbar().hide();
+        scrolledWindow.setPropagateNaturalWidth(true);
+        scrolledWindow.setMinContentWidth(250);
+        commandsGroup.addCssClass("navigation-sidebar");
         setFoldPolicy(FlapFoldPolicy.AUTO);
         setFoldThresholdPolicy(FoldThresholdPolicy.NATURAL);
         setFlap(scrolledWindow);
@@ -40,13 +39,15 @@ public class CommandSidebar extends Flap {
             ActionRow row = new ActionRow();
             row.setTitle(info.name);
             row.setActivatable(true);
+            row.addCssClass("raised");
             Button addButton = Button.newFromIconNameButton("list-add-symbolic");
+            addButton.setValign(Align.CENTER);
+//            addButton.addCssClass("flat");
+            addButton.addCssClass("circular");
             row.addPrefix(addButton);
             addButton.onClicked(row::activate);
             row.onActivate(() -> App.picker.stack.addCommandToVisibleChild(info));
-            commandsGroup.add(row);
-            commandsGroup.setTitle("Commands");
-            commandsGroup.setDescription("All of the commands in the robot project");
+            commandsGroup.append(row);
         }
     }
 

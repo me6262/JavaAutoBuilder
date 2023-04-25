@@ -12,11 +12,11 @@ public class Amode {
         this.name = val;
     }
 
-    private List<AmodeCommandList> commands = new ArrayList<AmodeCommandList>();
-    public List<AmodeCommandList> getCommands(){
+    private List<AmodeCommand> commands = new ArrayList<AmodeCommand>();
+    public List<AmodeCommand> getCommands(){
         return commands;
     }
-    public void setCommands(List<AmodeCommandList> val){
+    public void setCommands(List<AmodeCommand> val){
         commands = val;
     }
 }

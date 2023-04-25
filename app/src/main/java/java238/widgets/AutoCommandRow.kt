@@ -8,20 +8,24 @@ import ch.bailu.gtk.gdk.Drag
 import ch.bailu.gtk.gdk.Paintable
 import ch.bailu.gtk.gio.File
 import ch.bailu.gtk.gtk.*
-import ch.bailu.gtk.lib.bridge.CSS
 import ch.bailu.gtk.type.PointerContainer
 import ch.bailu.gtk.type.Str
 import java238.App
-import java238.background.AmodeCommandList
+import java238.background.AmodeCommand
 import java238.background.CommandInfo
-import java238.background.RobotProject
 import java.util.function.Supplier
 
+/**
+ * ExpanderRow that contains all the parameters of the command given to it (managed by AmodeEditorWidget)
+ *
+ * @see ExpanderRow
+ *
+ */
 class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
-    var command: AmodeCommandList? = null
-    val parametersMap = HashMap<String, Supplier<Str?>>()
+    private var command: AmodeCommand? = null
+    private val parametersMap = HashMap<String, Supplier<Str?>>()
     private lateinit var info: CommandInfo
-    val dnd: DragSource = DragSource()
+    private val dnd: DragSource = DragSource()
 
     internal enum class ParallelType {
         Parallel, Race, Deadline_Leader, Deadline_Follower, None
@@ -36,81 +40,110 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
         dnd.onDragBegin { drag: Drag -> onDragBegin(drag) }
         dnd.onPrepare { v: Double, v1: Double -> onPrepare(v, v1) }
         expanded = false
+
+
+
+        onActivate { }
+
     }
 
     val self: AutoCommandRow
         get() = this
 
-    fun setParameterFields(commandList: AmodeCommandList) {
-        command = commandList
-        setName(commandList.name)
-        setTitle(commandList.name)
+
+    /**
+     * creates a field/dropdown/switch for each parameter given, assuming that the wpilib directory is properly set,
+     * otherwise, everything is an EntryRow except for the trajectoryName parameter
+     *
+     * @param command information required to create the fields to edit the parameters within the expander row
+     */
+    fun setParameterFields(command: AmodeCommand) {
+        this.command = command
+        setName(command.name)
+        setTitle(command.name)
         val commands = App.project.commands
         for (commandInfo in commands) {
-            if (commandInfo.name == commandList.name) {
+            if (commandInfo.name == command.name) {
                 info = commandInfo
             }
         }
-        val parameters = commandList.parameters
-        for (i in parameters.indices) {
-            val parameter = parameters[i]
+
+
+
+        val parameters = command.parameters
+        for (i in info.parameters.indices) {
+            var parameter: String? = null
+            if (parameters.size != 0) {
+                parameter = parameters[i]
+            }
             val entryRow = EntryRow()
             if (info.parameters.size == 0) continue
-            val paramName = info.parameters[i]!!.strip().split("\"".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            entryRow.setTitle(if (paramName.size == 1) paramName[0] else paramName[1])
-            if (info.parameters[i]!!.contains("TrajectoryName")) {
-                val actionRow = ActionRow()
-                val trajectoryName = ComboBoxText.newWithEntryComboBoxText()
-                val trajectories = App.project.trajectories
-                actionRow.setTitle("Trajectory Name")
-                if (trajectories != null) {
-                    for (j in trajectories.indices) {
-                        trajectoryName.appendText(trajectories[j])
-                        if (trajectories[j] == parameter) {
-                            trajectoryName.setActiveId(trajectories[j])
-                            trajectoryName.active = j
-                        }
-                        parametersMap[if (paramName.size == 1) paramName[0] else paramName[1]] = Supplier { trajectoryName.activeText }
+            val paramName = info.parameters[i]!!.removeSurrounding("\"")
+            entryRow.setTitle(paramName)
+
+            //if this is the parameters that need the names of the trajectories
+            if (App.settings.pluginsEnabled) {
+                val pluginClass = App.plugins.plugins[entryRow.title.toString()]
+                if (pluginClass != null) {
+                    var plugin = pluginClass.getConstructor(String::class.java).newInstance(parameter)
+                    addRow(plugin.parameterWidget)
+                    if (parameter != null) {
+                        parametersMap[paramName] = Supplier<Str?>{ plugin.parameterAsStr!! }
+
+                        continue
                     }
                 }
-                actionRow.addSuffix(trajectoryName)
-                addRow(actionRow)
-            } else {
-                if (info.parameterClasses[i].isEnum) {
+            }
+
+            //if loading classes is turned on, check the type of the current parameter in the constructor,
+            //and use a dropdown/switch/entry depending on the type
+            if (App.settings.classLoading) {
+                //if it's an enum, load the class, iterate through its constants and add them as options to a comboBox
+                if (info.parameterClasses[i]!!.isEnum) {
                     val enumBoxText = ComboBoxText()
                     val actionRow = ActionRow()
-                    val paramClass = info.parameterClasses[i]
-                    for (enumeration in info.parameterClasses[i].enumConstants) {
+                    for (enumeration in info.parameterClasses[i]!!.enumConstants) {
                         enumBoxText.appendText(enumeration.toString())
+                        if (parameter == null) {
+                            enumBoxText.active = (enumeration as Enum<*>).ordinal
+                            continue
+                        }
                         if (enumeration.toString() == parameter.uppercase()){
                             enumBoxText.active = (enumeration as Enum<*>).ordinal
                         }
                     }
                     actionRow.addSuffix(enumBoxText)
-                    actionRow.setTitle(entryRow.title)
+                    actionRow.title = entryRow.title
                     addRow(actionRow)
-                    parametersMap[if (paramName.size == 1) paramName[0] else paramName[1]] = Supplier { enumBoxText.activeText }
+                    parametersMap[paramName] = Supplier { enumBoxText.activeText }
                     continue
 
                 }
-                if (info.parameterClasses[i].typeName == "boolean") {
-                    val boolBoxText = ComboBoxText()
+                // use a switch if it's a boolean
+                if (info.parameterClasses[i]!!.typeName == "boolean") {
+                    val switch = Switch()
+                    switch.valign = Align.CENTER
+                    switch.active = parameter.toBoolean() == true
                     val actionRow = ActionRow()
-                    boolBoxText.appendText("false")
-                    boolBoxText.appendText("true")
-                    boolBoxText.active = if (info.parameters[i]!!.lowercase() == "true") 1 else 0
-                    actionRow.addSuffix(boolBoxText)
+                    actionRow.activatableWidget = switch
+                    actionRow.addSuffix(switch)
                     addRow(actionRow)
-                    actionRow.setTitle(entryRow.title)
-                    parametersMap[if (paramName.size == 1) paramName[0] else paramName[1]] = Supplier { boolBoxText.activeText }
+                    actionRow.title = entryRow.title
+                    parametersMap[paramName] = Supplier { Str(switch.active.toString()) }
                     continue
                 }
                 entryRow.asEditable().setText(parameter)
-                parametersMap[if (paramName.size == 1) paramName[0] else paramName[1]] = Supplier { entryRow.asEditable().text }
+                parametersMap[paramName] = Supplier { entryRow.asEditable().text }
+                addRow(entryRow)
+            } else {
+                entryRow.asEditable().setText(parameter)
+                parametersMap[paramName] = Supplier { entryRow.asEditable().text }
                 addRow(entryRow)
             }
         }
-        val type = ParallelType.valueOf(commandList.parallelType)
+
+        //make the comboBox for the parallel type
+        val type = ParallelType.valueOf(command.parallelType)
         val comboBoxText = ComboBoxText()
         comboBoxText.appendText("Parallel")
         comboBoxText.appendText("Race")
@@ -129,22 +162,29 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
         addRow(parallelRow)
     }
 
-    val updatedCommandList: AmodeCommandList?
+    /**
+     * updates the AmodeCommand describing this row with the edited contents of the row
+     */
+    val updatedCommandList: AmodeCommand?
         get() {
             val parameters = ArrayList<String>()
-            if (info.parameters.size > 1) {
+            if (info.parameters.size >= 1) {
                 for (i in info.parameters.indices) {
-                    if (parametersMap[info.parameters[i]!!.strip().split("\"".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]]!!.get() != null) {
-                        parameters.add(parametersMap[info.parameters[i]!!.strip().split("\"".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]]!!.get().toString())
+                    if (parametersMap[info.parameters[i]?.removeSurrounding("\"")]?.get() != null) {
+                        parameters.add(parametersMap[info.parameters[i]?.removeSurrounding("\"")]?.get().toString())
                     }
                 }
                 command!!.parallelType = parametersMap["ParallelType"]!!.get().toString()
             }
             command!!.setParameters(parameters)
-            println("Set " + command!!.name)
+//            println("Set " + command!!.name)
             return command
         }
 
+
+    /**
+     * doesn't really do much yet
+     */
     private fun onDragBegin(drag: Drag) {
         val paintable = Paintable(PointerContainer(this.asCPointer()))
         val file = File.newForPath(Str("/home/haydenm/IdeaProjects/JavaAutoBuilder/app/src/main/resources/icons.png"))

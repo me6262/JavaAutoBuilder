@@ -3,7 +3,11 @@ package java238.background;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AmodeCommandList{
+
+/**
+ * mapped by the json objectmapper
+ */
+public class AmodeCommand {
     private String name;
     public String getName(){
         return name;

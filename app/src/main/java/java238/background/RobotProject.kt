@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import java238.App
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -15,16 +16,24 @@ import java.net.URL
 import java.net.URLClassLoader
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.Scanner
+import java.util.*
 import java.util.regex.Pattern
-import kotlin.collections.ArrayList
 
-class RobotProject {
+class RobotProject(var rootDirectory: String) {
     private val mapper: ObjectMapper = ObjectMapper()
     private var jsonString: String? = null
     var trajectories: ArrayList<String>? = null
         private set
 
+    constructor() : this("")
+
+    init {
+        mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
+        if (rootDirectory.isNotEmpty()) {
+            loadRobotProject()
+
+        }
+    }
     @Throws(FileNotFoundException::class)
     fun indexCommands() {
         val pattern = Pattern.compile(Constants.autoModeAnnotationRegex)
@@ -52,10 +61,12 @@ class RobotProject {
             params = findPattern!!.substring(44, findPattern.length - 2).split(", ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
             val paramsList: ArrayList<String?> = params.toMutableList() as ArrayList<String?>
+            var parameterTypes: Array<Class<*>?> = Array(1){null}
+            if (App.settings.classLoading) {
             val urls: Array<URL> = Array(4){File("$rootDirectory/build/classes/java/main/").toURI().toURL()}
-            urls[1] =  File( "/home/haydenm/wpilib/2023/maven/edu/wpi/first/wpilibj/wpilibj-java/2023.4.2/wpilibj-java-2023.4.2.jar/").toURI().toURL()
-            urls[2] =  File( "/home/haydenm/wpilib/2023/maven/edu/wpi/first/wpilibNewCommands/wpilibNewCommands-java/2023.4.2/wpilibNewCommands-java-2023.4.2.jar/").toURI().toURL()
-            urls[3] =  File( "/home/haydenm/wpilib/2023/maven/edu/wpi/first/wpiutil/wpiutil-java/2023.4.2/wpiutil-java-2023.4.2.jar/").toURI().toURL()
+            urls[1] =  File( "${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpilibj/wpilibj-java/${App.settings.wpilibVersion}/wpilibj-java-${App.settings.wpilibVersion}.jar/").toURI().toURL()
+            urls[2] =  File( "${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpilibNewCommands/wpilibNewCommands-java/${App.settings.wpilibVersion}/wpilibNewCommands-java-${App.settings.wpilibVersion}.jar/").toURI().toURL()
+            urls[3] =  File( "${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpiutil/wpiutil-java/${App.settings.wpilibVersion}/wpiutil-java-${App.settings.wpilibVersion}.jar/").toURI().toURL()
             val loader: ClassLoader = URLClassLoader(urls)
             val loadedClass = loader.loadClass("frc.robot.commands.$name")
             for (constructor in loadedClass.constructors) {
@@ -64,7 +75,8 @@ class RobotProject {
 
                 }
             }
-            val parameterTypes: Array<Class<*>> = commandConstructor!!.parameterTypes
+            parameterTypes = commandConstructor!!.parameterTypes
+            }
             info = CommandInfo(name, paramsList, parameterTypes)
             Companion.commands.add(info)
             println(info.name + " with parameters " + info.parameters.toString().strip())
@@ -83,9 +95,6 @@ class RobotProject {
         println(trajectories)
     }
 
-    init {
-        mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
-    }
 
     fun loadRobotProject() {
         jsonString = try {
@@ -113,9 +122,9 @@ class RobotProject {
             saveOut()
         }
 
-    fun saveOut() {
+    private fun saveOut() {
         try {
-            println(mapper.writeValueAsString(amodesList))
+            mapper.writerWithDefaultPrettyPrinter().writeValue(File(rootDirectory + Constants.deployDirectory + "amode238.txt"), amodesList)
         } catch (e: JsonProcessingException) {
             throw RuntimeException(e)
         }
@@ -138,7 +147,6 @@ class RobotProject {
     }
 
     companion object {
-        lateinit var rootDirectory: String
         private var amodesList: AmodeList? = null
         private val commands: MutableList<CommandInfo> = ArrayList()
         val oSName: OSName

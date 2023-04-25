@@ -4,20 +4,20 @@ import ch.bailu.gtk.adw.*;
 import ch.bailu.gtk.adw.ApplicationWindow;
 import ch.bailu.gtk.adw.HeaderBar;
 import ch.bailu.gtk.gdk.Gdk;
-import ch.bailu.gtk.gio.ApplicationFlags;
+import ch.bailu.gtk.gio.*;
 import ch.bailu.gtk.gtk.*;
 import ch.bailu.gtk.gtk.Application;
-import ch.bailu.gtk.lib.bridge.CSS;
-import ch.bailu.gtk.type.Pointer;
-import ch.bailu.gtk.type.PointerContainer;
 import ch.bailu.gtk.type.Str;
 import ch.bailu.gtk.type.Strs;
 import java238.background.Amode;
 import java238.background.RobotProject;
+import java238.plugins.PluginManager;
 import java238.widgets.AutoPicker;
 import java238.widgets.LoadFileDialog;
+import java238.widgets.Settings;
 
 import java.io.FileNotFoundException;
+import java.nio.file.Paths;
 import java.util.List;
 
 
@@ -29,35 +29,35 @@ public class App {
     public static LoadFileDialog loadFileDialog;
     public static HeaderBar header;
     public static WindowTitle title;
+    public static Settings settings;
+    public static PluginManager plugins;
 
     public static void init() {
+        settings = new Settings();
+        if (!settings.getProjectDir().equals("")) {
+            project = new RobotProject(settings.getProjectDir());
+        } else {
+            project = new RobotProject();
+        }
+        plugins = new PluginManager();
         loadFileDialog = new LoadFileDialog();
-        project = new RobotProject();
     }
 
-    public static void onStartup() {
-//        StyleManager.getDefault().setColorScheme(ColorScheme.FORCE_LIGHT);
-    }
 
     public static void main(String[] args) {
         Adw.init();
         app = new Application("org.frc238.autoBuilder", ApplicationFlags.FLAGS_NONE);
         init();
         header = new HeaderBar();
+        header.addCssClass("flat");
+        File gresource = File.newForPath(new Str(""));
         picker = new AutoPicker();
 
-        Strs accels = new Strs(new Str[]{new Str("<Ctrl>+h")});
-        System.out.println(Gdk.keyvalFromName(new Str("<Control>h")));
-
-        System.out.println(Gdk.keyvalName(16777215));
-        System.out.println(accels.get(0));
-        app.setAccelsForAction("modestack::move-up", accels);
-//        System.out.println(app.getAccelsForAction(new Str("modestack::move-up")).get(0));
-        app.onStartup(App::onStartup);
         app.onActivate(() -> {
             title = new WindowTitle("Autonomous Builder", "");
             StyleManager.getDefault().setColorScheme(ColorScheme.FORCE_DARK);
             header.setTitleWidget(title);
+            var cssProvider = new CssProvider();
 
             var toggleCommandFlap = new Button();
             toggleCommandFlap.setIconName("go-previous-symbolic");
@@ -67,22 +67,31 @@ public class App {
             });
             header.packEnd(toggleCommandFlap);
 
+            var menubutton = new MenuButton();
+            menubutton.setIconName("open-menu-symbolic");
+            var menu = new Menu();
+            var about = new MenuItem("About", "app.about");
+            menu.appendItem(about);
+            var aboutAction = new SimpleAction("about", null);
+            app.asActionMap().addAction(aboutAction.asAction());
+            aboutAction.onActivate((signal) -> showAboutWindow());
+
+            var properties = new MenuItem("Properties", "app.properties");
+            var propertiesAction = new SimpleAction("properties", null);
+            menu.appendItem(properties);
+            propertiesAction.onActivate((signal) -> settings.openPrefsWindow());
+
+            app.asActionMap().addAction(propertiesAction.asAction());
+
+
+            menubutton.setMenuModel(menu);
+            header.packEnd(menubutton);
+
             var load = new Button();
             load.setLabel("Load");
             load.onClicked(loadFileDialog::loadFolder);
             load.setIconName("folder-open-symbolic");
             header.packEnd(load);
-
-
-//            var aboutButton = new MenuItem("About", );
-//            var menuModel = new MenuModel(MenuModel.);
-//            var pop = PopoverMenu.newFromModelPopoverMenu(menuModel);;
-
-//            var menu = new MenuButton();
-//            menu.setIconName("open-menu-symbolic");
-//            menu.onActivate(App::onMenuClicked);
-//            menu.setPopover(pop);
-//            header.packEnd(menu);
 
 
             var save = new Button();
@@ -91,11 +100,9 @@ public class App {
             header.packEnd(save);
 
             var toggleFlap = new Button();
-            toggleFlap.setIconName("go-previous-symbolic");
-            toggleFlap.onClicked(() -> {
-                picker.onToggleClicked();
-                toggleFlap.setIconName(toggleFlap.getIconName().toString().equals("go-next-symbolic") ? "go-previous-symbolic" : "go-next-symbolic");
-            });
+            toggleFlap.setIconName("dock-left");
+
+            toggleFlap.onClicked(picker::onToggleClicked);
             header.packStart(toggleFlap);
 
             var addNewMode = new Button();
@@ -108,9 +115,11 @@ public class App {
             header.packStart(removeMode);
 
 
-
             window = new ApplicationWindow(app);
             window.setDirection(Orientation.VERTICAL);
+            cssProvider.loadFromPath(Paths.get("").toAbsolutePath() + "/src/main/resources/gtk.css");
+            StyleContext.addProviderForDisplay(window.getDisplay(), cssProvider.asStyleProvider(), ToastPriority.HIGH);
+//            window.addCssClass("accent");
 
 
             Box vbox = new Box(Orientation.VERTICAL, 0);
@@ -126,20 +135,32 @@ public class App {
         });
         app.run(args.length, new Strs(args));
 
+        if (!settings.getProjectDir().isEmpty()) {
+            initAutoList();
+        }
+
+    }
+
+    private static void showAboutWindow() {
+        var aboutMenu = new AboutWindow();
+        aboutMenu.setApplication(app);
+        aboutMenu.addCreditSection("Developers", new Strs(new String[]{"Hayden Mitchell"}));
+        aboutMenu.show();
     }
 
     public static void initAutoList() {
         List<Amode> modes = project.getAutoModes().getAutonomousModes();
         picker.stack.setAmodeList(project.getAutoModes());
         try {
-        project.indexCommands();
-        project.indexTrajectories();
-        picker.commandSidebar.generateList();
+            project.indexCommands();
+            project.indexTrajectories();
+            picker.commandSidebar.generateList();
 
         } catch (FileNotFoundException e) {
             System.out.println("Whoops, no file here!");
         }
         picker.setModes(modes);
+        System.out.println("dfghjkl");
     }
 
     public static void saveAmodeFile() throws NullPointerException {
