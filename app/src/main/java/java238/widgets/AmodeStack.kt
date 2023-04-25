@@ -12,6 +12,7 @@ import ch.bailu.gtk.gtk.Stack
 import ch.bailu.gtk.gtk.StackPage
 import ch.bailu.gtk.gtk.Widget
 import ch.bailu.gtk.type.PointerContainer
+import ch.bailu.gtk.type.Str
 import java238.App
 import java238.background.Amode
 import java238.background.AmodeList
@@ -91,6 +92,12 @@ class AmodeStack : Stack() {
         println("woah")
     }
     fun removeAmode() {
+        editorWidgetSupplier.remove(visibleChildName.toString())
+        getPage(visibleChild).run {
+            title = Str("")
+            this.visible= false
+        }
+
     }
 
     fun addCommandToVisibleChild(info: CommandInfo?) {
