@@ -16,7 +16,7 @@ import java238.background.AmodeCommand
 import java238.background.CommandInfo
 import java.util.function.Supplier
 
-class AmodeEditorWidget(commandList: Amode) : Bin() {
+class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {
     private var focusedCommandName: String? = null
     private var amodeCommands: ListBox = ListBox()
     private var amodeCommandListMap = ArrayList<Supplier<AutoCommandRow>>()

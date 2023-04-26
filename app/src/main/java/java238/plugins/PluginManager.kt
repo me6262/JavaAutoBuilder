@@ -4,22 +4,21 @@ import java.io.File
 import java.io.IOException
 import java.net.URL
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 
 class PluginManager {
 
-    val plugins = HashMap<String, Class<Plugin>>()
+    val plugins = HashMap<Boolean, Class<Plugin>>()
+    val allowedPlugins = HashMap<String, Pair<Boolean, Class<Plugin>>>()
     init {
         for (plugin in getClasses()) {
-            if (plugin != null) {
-                for (iface in plugin.interfaces) {
-                    if (iface.name.contains("Plugin") && !plugin.isInterface) {
-                        println(plugin.name)
-                        plugins += Pair((plugin.getConstructor().newInstance() as Plugin).parameterName, plugin as Class<Plugin>)
-                    }
-                }
+            if (plugin == null) continue
+
+            for (iface in plugin.interfaces) {
+                if (!iface.name.contains("Plugin") || plugin.isInterface) continue
+
+                println(plugin.name)
+                allowedPlugins += Pair((plugin.getConstructor().newInstance() as Plugin).parameterName, Pair(true, plugin as Class<Plugin>))
             }
 
         }

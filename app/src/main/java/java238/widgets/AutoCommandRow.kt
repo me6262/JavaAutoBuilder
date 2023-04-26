@@ -83,9 +83,13 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
 
             //if this is the parameters that need the names of the trajectories
             if (App.settings.pluginsEnabled) {
-                val pluginClass = App.plugins.plugins[entryRow.title.toString()]
+                //gets the pair from the hashmap and checks if the first element (boolean) is true
+                // meaning the plugin was enabled, if so, pluginClass = that class, else, null
+                val pluginClass = App.plugins.allowedPlugins[entryRow.title.toString()].run {
+                    if (this?.first == true) this.second else null
+                }
                 if (pluginClass != null) {
-                    var plugin = pluginClass.getConstructor(String::class.java).newInstance(parameter)
+                    val plugin = pluginClass.getConstructor(String::class.java).newInstance(parameter)
                     addRow(plugin.parameterWidget)
                     if (parameter != null) {
                         parametersMap[paramName] = Supplier<Str?>{ plugin.parameterAsStr!! }
@@ -124,11 +128,13 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
                     val switch = Switch()
                     switch.valign = Align.CENTER
                     switch.active = parameter.toBoolean() == true
-                    val actionRow = ActionRow()
-                    actionRow.activatableWidget = switch
-                    actionRow.addSuffix(switch)
-                    addRow(actionRow)
-                    actionRow.title = entryRow.title
+
+                    val actionRow = ActionRow().also {
+                        it.activatableWidget = switch
+                        it.addSuffix(switch)
+                        addRow(it)
+                        it.title = entryRow.title
+                    }
                     parametersMap[paramName] = Supplier { Str(switch.active.toString()) }
                     continue
                 }

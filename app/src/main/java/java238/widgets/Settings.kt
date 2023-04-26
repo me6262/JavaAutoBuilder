@@ -86,18 +86,33 @@ class Settings {
         preferencesPage.add(preferencesGroup)
 
 
-        val versionRow = EntryRow()
-        versionRow.setTitle("WPILib Project Version Number")
-        versionRow.asEditable().setText(wpilibVersion)
-        preferencesGroup.add(versionRow)
+        val versionRow = EntryRow().also {
+            it.title = Str("WPILib Project Version Number")
+            it.asEditable().setText(wpilibVersion)
+            preferencesGroup.add(it)
+        }
 
-        val canAccessClasses = ActionRow()
-        canAccessClasses.activatableWidget = acessClassesSuffix
-        canAccessClasses.title = Str("Load Classes From Robot Project")
-        canAccessClasses.subtitle = Str("makes cooler parameter fields for booleans and enums")
+        val pluginSwitch = Switch().also {
+            it.active = pluginsEnabled
+            it.valign = Align.CENTER
+        }
+
+        val enablePlugins = ActionRow().also {
+            it.title = Str("Enable Plugins")
+            it.subtitle = Str("Used for special sources for parameters")
+            it.addSuffix(pluginSwitch)
+            preferencesGroup.add(it)
+        }
+
+        val canAccessClasses = ActionRow().also {
+            it.activatableWidget = acessClassesSuffix
+            it.title = Str("Load Classes From Robot Project")
+            it.subtitle = Str("makes cooler parameter fields for booleans and enums")
+            it.addSuffix(acessClassesSuffix)
+        }
+
         acessClassesSuffix.active = classLoading
         acessClassesSuffix.valign = Align.CENTER
-        canAccessClasses.addSuffix(acessClassesSuffix)
         preferencesGroup.add(canAccessClasses)
         prefWindow.onHide { classLoading = acessClassesSuffix.active }
         val chooserRow = EntryRow()
@@ -129,6 +144,7 @@ class Settings {
             wpilibVersion = versionRow.asEditable().text.toString()
             wpiDirectory = chooserRow.asEditable().text.toString()
             classLoading = acessClassesSuffix.active
+            pluginsEnabled = pluginSwitch.active
             saveSettings()
         }
     }
@@ -139,7 +155,7 @@ class Settings {
 
     fun saveSettings() {
         println(json)
-        val writer = FileWriter(Paths.get("").toAbsolutePath().toString() + "/src/main/resources/settings.json")
+        val writer = FileWriter(File(Paths.get("").toAbsolutePath().toString() + "/src/main/resources/settings.json").toPath().toString())
         writer.write(json!!.toJSONString())
         writer.flush()
     }

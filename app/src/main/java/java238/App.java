@@ -9,6 +9,7 @@ import ch.bailu.gtk.gtk.*;
 import ch.bailu.gtk.gtk.Application;
 import ch.bailu.gtk.type.Str;
 import ch.bailu.gtk.type.Strs;
+import ch.bailu.gtk.type.exception.AllocationError;
 import java238.background.Amode;
 import java238.background.RobotProject;
 import java238.plugins.PluginManager;
@@ -18,6 +19,7 @@ import java238.widgets.Settings;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Paths;
+import java.security.interfaces.RSAKey;
 import java.util.List;
 
 
@@ -50,7 +52,12 @@ public class App {
         init();
         header = new HeaderBar();
         header.addCssClass("flat");
-        File gresource = File.newForPath(new Str(""));
+        File gresource = File.newForPath(new Str("/src/main/resources/icons/resources.gresource.xml"));
+        try {
+            Gio.resourceLoad(gresource.getPath());
+        } catch (AllocationError e) {
+            throw new RuntimeException(e);
+        }
         picker = new AutoPicker();
 
         app.onActivate(() -> {
@@ -60,10 +67,9 @@ public class App {
             var cssProvider = new CssProvider();
 
             var toggleCommandFlap = new Button();
-            toggleCommandFlap.setIconName("go-previous-symbolic");
+            toggleCommandFlap.setIconName("sidebar-show-right-symbolic");
             toggleCommandFlap.onClicked(() -> {
                 picker.commandSidebar.onToggleClicked();
-                toggleCommandFlap.setIconName(picker.commandSidebar.getRevealFlap() ? "go-previous-symbolic" : "go-next-symbolic");
             });
             header.packEnd(toggleCommandFlap);
 
@@ -100,8 +106,7 @@ public class App {
             header.packEnd(save);
 
             var toggleFlap = new Button();
-            toggleFlap.setIconName("dock-left");
-
+            toggleFlap.setIconName("sidebar-show-symbolic");
             toggleFlap.onClicked(picker::onToggleClicked);
             header.packStart(toggleFlap);
 
@@ -132,12 +137,12 @@ public class App {
             window.setContent(vbox);
 
             window.present();
+            if (!settings.getProjectDir().isEmpty()) {
+                initAutoList();
+            }
         });
         app.run(args.length, new Strs(args));
 
-        if (!settings.getProjectDir().isEmpty()) {
-            initAutoList();
-        }
 
     }
 

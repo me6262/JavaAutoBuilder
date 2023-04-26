@@ -5,7 +5,6 @@ import ch.bailu.gtk.adw.PreferencesRow
 import ch.bailu.gtk.gtk.ComboBoxText
 import ch.bailu.gtk.type.Str
 import java238.App
-import java.util.function.Supplier
 
 class TrajectoryName(parameter: String) : Plugin {
 
