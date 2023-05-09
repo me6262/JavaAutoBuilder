@@ -138,7 +138,7 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
                     parametersMap[paramName] = Supplier { Str(switch.active.toString()) }
                     continue
                 }
-                entryRow.asEditable().setText(parameter)
+                entryRow.asEditable().text = Str(parameter)
                 parametersMap[paramName] = Supplier { entryRow.asEditable().text }
                 addRow(entryRow)
             } else {
@@ -193,7 +193,7 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
      */
     private fun onDragBegin(drag: Drag) {
         val paintable = Paintable(PointerContainer(this.asCPointer()))
-        val file = File.newForPath(Str("/home/haydenm/IdeaProjects/JavaAutoBuilder/app/src/main/resources/icons.png"))
+        val file = File.newForPath(Str("icons.png"))
         val paint = IconPaintable.newForFileIconPaintable(file, 240, 2)
         dnd.setIcon(paint.asPaintable(), 0, 0)
     }

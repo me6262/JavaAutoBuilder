@@ -8,14 +8,14 @@ import java238.App;
 
 public class LoadFileDialog {
     String currentProjectFolder;
-    FileChooserNative chooser;
+    FileChooserDialog chooser;
 
     public LoadFileDialog() {
 
     }
 
     public void loadFolder() {
-        chooser = new FileChooserNative("Stuff", App.window, FileChooserAction.SELECT_FOLDER, "Open", "Cancel");
+        chooser = new FileChooserDialog("Stuff", App.window, FileChooserAction.SELECT_FOLDER, "Open",  ResponseType.ACCEPT);
         chooser.onResponse(this::onResponse);
         File startPath = File.newForPath(new Str("~/"));
         try {

@@ -64,7 +64,7 @@ class Settings {
             BufferedReader(
                 FileReader(
                     File(
-                        Paths.get("").toAbsolutePath().toString() + "/src/main/resources/settings.json"
+                        "${Paths.get("").toAbsolutePath()}\\settings.json"
                     )
                 )
             ).use { br ->

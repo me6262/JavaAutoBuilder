@@ -52,7 +52,7 @@ public class App {
         init();
         header = new HeaderBar();
         header.addCssClass("flat");
-        File gresource = File.newForPath(new Str("/src/main/resources/icons/resources.gresource.xml"));
+        File gresource = File.newForPath(new Str("icons/resources.gresource.xml"));
         try {
             Gio.resourceLoad(gresource.getPath());
         } catch (AllocationError e) {
@@ -122,7 +122,7 @@ public class App {
 
             window = new ApplicationWindow(app);
             window.setDirection(Orientation.VERTICAL);
-            cssProvider.loadFromPath(Paths.get("").toAbsolutePath() + "/src/main/resources/gtk.css");
+            cssProvider.loadFromPath(Paths.get("").toAbsolutePath() + "/gtk.css");
             StyleContext.addProviderForDisplay(window.getDisplay(), cssProvider.asStyleProvider(), ToastPriority.HIGH);
 //            window.addCssClass("accent");
 

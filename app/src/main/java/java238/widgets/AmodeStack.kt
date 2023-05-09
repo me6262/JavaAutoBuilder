@@ -22,13 +22,12 @@ import java.util.function.Supplier
 
 class AmodeStack : Stack() {
     var amodeList: AmodeList? = null
-    var noneSelected: StatusPage
-    var editorWidgetSupplier: MutableMap<String, Supplier<AmodeEditorWidget>> = TreeMap()
-    var up: Button
-    var down: Button
+    private var noneSelected: StatusPage = StatusPage()
+    private var editorWidgetSupplier: MutableMap<String, Supplier<AmodeEditorWidget>> = TreeMap()
+    private var up: Button
+    private var down: Button
 
     init {
-        noneSelected = StatusPage()
         val action = SimpleAction("move-up", null)
         action.onActivate { println("asjdasdsda") }
         setName("amodestack")
@@ -40,10 +39,14 @@ class AmodeStack : Stack() {
         noneSelected.setDescription("Please pick an auto or load a robot project")
         addNamed(noneSelected, "none")
         setVisibleChildName("none")
-        up = Button.newFromIconNameButton("go-up-symbolic")
-        up.onClicked { moveFocusedCommandUp() }
-        down = Button.newFromIconNameButton("go-down-symbolic")
-        down.onClicked { moveFocusedCommandDown() }
+        up = Button.newFromIconNameButton("go-up-symbolic").also {
+            it.onClicked { moveFocusedCommandUp() }
+            App.header.packEnd(it)
+        }
+        down = Button.newFromIconNameButton("go-down-symbolic").also {
+            it.onClicked { moveFocusedCommandDown() }
+            App.header.packEnd(it)
+        }
 
         val rename = Button.newFromIconNameButton("document-edit-symbolic").also {
             it.onClicked {renameMode()}

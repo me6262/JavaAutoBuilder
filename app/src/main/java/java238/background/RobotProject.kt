@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.sun.jna.Platform
 import java238.App
 import java.io.File
 import java.io.FileNotFoundException
@@ -64,9 +65,15 @@ class RobotProject(var rootDirectory: String) {
             var parameterTypes: Array<Class<*>?> = Array(1){null}
             if (App.settings.classLoading) {
             val urls: Array<URL> = Array(4){File("$rootDirectory/build/classes/java/main/").toURI().toURL()}
-            urls[1] =  File( "${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpilibj/wpilibj-java/${App.settings.wpilibVersion}/wpilibj-java-${App.settings.wpilibVersion}.jar/").toURI().toURL()
-            urls[2] =  File( "${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpilibNewCommands/wpilibNewCommands-java/${App.settings.wpilibVersion}/wpilibNewCommands-java-${App.settings.wpilibVersion}.jar/").toURI().toURL()
-            urls[3] =  File( "${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpiutil/wpiutil-java/${App.settings.wpilibVersion}/wpiutil-java-${App.settings.wpilibVersion}.jar/").toURI().toURL()
+            urls[1] =  File( "${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpilibj/wpilibj-java/${App.settings.wpilibVersion}/wpilibj-java-${App.settings.wpilibVersion}.jar/".apply {
+                if (Platform.isWindows()) this.replace("/", "\\")
+            }).toURI().toURL()
+            urls[2] =  File( "${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpilibNewCommands/wpilibNewCommands-java/${App.settings.wpilibVersion}/wpilibNewCommands-java-${App.settings.wpilibVersion}.jar/".apply {
+                if (Platform.isWindows()) this.replace("/", "\\")
+            }).toURI().toURL()
+            urls[3] =  File( "${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpiutil/wpiutil-java/${App.settings.wpilibVersion}/wpiutil-java-${App.settings.wpilibVersion}.jar/".apply {
+                if (Platform.isWindows()) this.replace("/", "\\")
+            }).toURI().toURL()
             val loader: ClassLoader = URLClassLoader(urls)
             val loadedClass = loader.loadClass("frc.robot.commands.$name")
             for (constructor in loadedClass.constructors) {
@@ -85,7 +92,7 @@ class RobotProject(var rootDirectory: String) {
 
     fun indexTrajectories() {
         trajectories = ArrayList()
-        val pattern = Pattern.compile(rootDirectory + Constants.deployDirectory + Constants.pathPlannerDir)
+        val pattern = Pattern.compile((rootDirectory + Constants.deployDirectory + Constants.pathPlannerDir).replace("\\", "\\\\"))
         val dir = File(rootDirectory + Constants.deployDirectory + Constants.pathPlannerDir)
         val dirList = dir.listFiles()!!
         for (child in dirList) {
@@ -134,11 +141,11 @@ class RobotProject(var rootDirectory: String) {
 
     object Constants {
         val amodeFile = "amode238.txt"
-        val deployDirectory = if (oSName == OSName.Unix) "/src/main/deploy/" else "\\src\\main\\deploy\\"
-        val pathPlannerDir = if (oSName == OSName.Unix) "pathplanner/" else "pathplanner\\"
-        val commandDirectory = if (oSName == OSName.Unix) "/src/main/java/frc/robot/commands/" else "\\src\\main\\java\\u000crc\\robot\\commands\\"
-        val commandsRegex = if (oSName == OSName.Unix) ".*/(.*).java" else ".*\\\\(.*).java"
-        val pathFileRegex = if (oSName == OSName.Unix) ".*/(.*)\\.path" else ".*\\\\(.*)\\.path"
+        val deployDirectory = if (Platform.isLinux()) "/src/main/deploy/" else "\\src\\main\\deploy\\"
+        val pathPlannerDir = if (Platform.isLinux()) "pathplanner/" else "pathplanner\\"
+        val commandDirectory = if (Platform.isLinux()) "/src/main/java/frc/robot/commands/" else "\\src\\main\\java\\frc\\robot\\commands\\"
+        val commandsRegex = if (Platform.isLinux()) ".*/(.*).java" else ".*\\\\(.*).java"
+        val pathFileRegex = if (Platform.isLinux()) ".*/(.*)\\.path" else ".*\\\\(.*)\\.path"
         val autoModeAnnotationRegex = "@AutonomousModeAnnotation\\(parameterNames = \\{(.*)}\\)"
     }
 
