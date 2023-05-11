@@ -79,7 +79,6 @@ class RobotProject(var rootDirectory: String) {
             for (constructor in loadedClass.constructors) {
                 if (constructor.parameterCount == params.size) {
                     commandConstructor = constructor
-
                 }
             }
             parameterTypes = commandConstructor!!.parameterTypes
@@ -88,18 +87,6 @@ class RobotProject(var rootDirectory: String) {
             Companion.commands.add(info)
             println(info.name + " with parameters " + info.parameters.toString().strip())
         }
-    }
-
-    fun indexTrajectories() {
-        trajectories = ArrayList()
-        val pattern = Pattern.compile((rootDirectory + Constants.deployDirectory + Constants.pathPlannerDir).replace("\\", "\\\\"))
-        val dir = File(rootDirectory + Constants.deployDirectory + Constants.pathPlannerDir)
-        val dirList = dir.listFiles()!!
-        for (child in dirList) {
-            println(child.name)
-            trajectories!!.add(child.name.split("\\.path".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0])
-        }
-        println(trajectories)
     }
 
 

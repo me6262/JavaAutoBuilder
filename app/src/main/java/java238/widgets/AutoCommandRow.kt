@@ -92,7 +92,7 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
                     val plugin = pluginClass.getConstructor(String::class.java).newInstance(parameter)
                     addRow(plugin.parameterWidget)
                     if (parameter != null) {
-                        parametersMap[paramName] = Supplier<Str?>{ plugin.parameterAsStr!! }
+                        parametersMap[paramName] = Supplier<Str?>{ plugin.parameterAsStr }
 
                         continue
                     }

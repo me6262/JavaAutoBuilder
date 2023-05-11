@@ -12,6 +12,7 @@ import ch.bailu.gtk.gtk.FileChooserNative
 import ch.bailu.gtk.gtk.ResponseType
 import ch.bailu.gtk.gtk.Switch
 import ch.bailu.gtk.type.Str
+import com.sun.jna.Platform
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import java.io.BufferedReader
@@ -63,9 +64,10 @@ class Settings {
         try {
             BufferedReader(
                 FileReader(
-                    File(
-                        "${Paths.get("").toAbsolutePath()}\\settings.json"
-                    )
+                    if (Platform.isWindows())
+                        File("${Paths.get("").toAbsolutePath()}\\settings.json")
+                    else
+                        File("${Paths.get("").toAbsolutePath()}/settings.json")
                 )
             ).use { br ->
 
@@ -155,7 +157,7 @@ class Settings {
 
     fun saveSettings() {
         println(json)
-        val writer = FileWriter(File(Paths.get("").toAbsolutePath().toString() + "/src/main/resources/settings.json").toPath().toString())
+        val writer = FileWriter(File(Paths.get("").toAbsolutePath().toString() + "${if (Platform.isWindows()) "\\" else "/"}settings.json").toPath().toString())
         writer.write(json!!.toJSONString())
         writer.flush()
     }

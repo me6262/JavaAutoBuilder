@@ -32,6 +32,15 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
 
+    implementation("org.jetbrains.kotlin:kotlin-scripting-common")
+    implementation("org.jetbrains.kotlin:kotlin-scripting-jvm")
+    implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies")
+    implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven")
+    implementation(kotlin("script-runtime"))
+    implementation(kotlin("script-util"))
+    implementation(kotlin("compiler-embeddable"))
+    implementation(kotlin("scripting-compiler-embeddable"))
+    implementation(kotlin("script-util"))
 }
 
 application {
