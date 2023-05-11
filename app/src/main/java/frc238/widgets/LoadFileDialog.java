@@ -1,10 +1,10 @@
-package java238.widgets;
+package frc238.widgets;
 
 import ch.bailu.gtk.gio.File;
 import ch.bailu.gtk.gtk.*;
 import ch.bailu.gtk.type.Str;
 import ch.bailu.gtk.type.exception.AllocationError;
-import java238.App;
+import frc238.App;
 
 public class LoadFileDialog {
     String currentProjectFolder;

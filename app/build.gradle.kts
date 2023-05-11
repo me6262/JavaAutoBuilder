@@ -45,7 +45,7 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass.set("java238.App")
+    mainClass.set("frc238.App")
 }
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {

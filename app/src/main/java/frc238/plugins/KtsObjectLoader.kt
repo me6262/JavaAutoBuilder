@@ -1,4 +1,4 @@
-package java238.plugins
+package frc238.plugins
 
 import java.io.InputStream
 import java.io.Reader

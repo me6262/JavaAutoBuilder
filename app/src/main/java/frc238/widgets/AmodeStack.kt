@@ -1,22 +1,18 @@
-package java238.widgets
+package frc238.widgets
 
 import ch.bailu.gtk.adw.StatusPage
 import ch.bailu.gtk.gio.SimpleAction
 import ch.bailu.gtk.gio.SimpleActionGroup
-import ch.bailu.gtk.glib.Variant
 import ch.bailu.gtk.gobject.ParamSpec
 import ch.bailu.gtk.gtk.Button
 import ch.bailu.gtk.gtk.Entry
 import ch.bailu.gtk.gtk.Popover
 import ch.bailu.gtk.gtk.Stack
-import ch.bailu.gtk.gtk.StackPage
-import ch.bailu.gtk.gtk.Widget
-import ch.bailu.gtk.type.PointerContainer
 import ch.bailu.gtk.type.Str
-import java238.App
-import java238.background.Amode
-import java238.background.AmodeList
-import java238.background.CommandInfo
+import frc238.App
+import frc238.background.Amode
+import frc238.background.AmodeList
+import frc238.background.CommandInfo
 import java.util.*
 import java.util.function.Supplier
 

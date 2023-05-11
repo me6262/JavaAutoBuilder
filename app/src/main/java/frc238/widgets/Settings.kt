@@ -1,4 +1,4 @@
-package java238.widgets
+package frc238.widgets
 
 import ch.bailu.gtk.adw.ActionRow
 import ch.bailu.gtk.adw.EntryRow
@@ -19,7 +19,6 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
-import java.io.Writer
 import java.nio.file.Paths
 
 

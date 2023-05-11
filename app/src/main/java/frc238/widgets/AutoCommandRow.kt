@@ -1,4 +1,4 @@
-package java238.widgets
+package frc238.widgets
 
 import ch.bailu.gtk.adw.ActionRow
 import ch.bailu.gtk.adw.EntryRow
@@ -10,9 +10,9 @@ import ch.bailu.gtk.gio.File
 import ch.bailu.gtk.gtk.*
 import ch.bailu.gtk.type.PointerContainer
 import ch.bailu.gtk.type.Str
-import java238.App
-import java238.background.AmodeCommand
-import java238.background.CommandInfo
+import frc238.App
+import frc238.background.AmodeCommand
+import frc238.background.CommandInfo
 import java.util.function.Supplier
 
 /**
@@ -69,7 +69,6 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
         }
 
 
-
         val parameters = command.parameters
         for (i in info.parameters.indices) {
             var parameter: String? = null
@@ -85,16 +84,13 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
             if (App.settings.pluginsEnabled) {
                 //gets the pair from the hashmap and checks if the first element (boolean) is true
                 // meaning the plugin was enabled, if so, pluginClass = that class, else, null
-                val pluginClass = App.plugins.allowedPlugins[entryRow.title.toString()].run {
-                    if (this?.first == true) this.second else null
-                }
-                if (pluginClass != null) {
-                    val plugin = pluginClass.getConstructor(String::class.java).newInstance(parameter)
-                    addRow(plugin.parameterWidget)
-                    if (parameter != null) {
-                        parametersMap[paramName] = Supplier<Str?>{ plugin.parameterAsStr }
-
-                        continue
+                if (App.plugins.allowedPlugins[paramName]?.first == true) {
+                    val pluginComboBoxText = ComboBoxText()
+                    for (str in App.plugins.allowedPlugins[paramName]!!.second.parameterOpts) {
+                        pluginComboBoxText.appendText(str)
+                        if (str == parameter) {
+                            pluginComboBoxText.activeText = str
+                        }
                     }
                 }
             }
@@ -112,7 +108,7 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
                             enumBoxText.active = (enumeration as Enum<*>).ordinal
                             continue
                         }
-                        if (enumeration.toString() == parameter.uppercase()){
+                        if (enumeration.toString() == parameter.uppercase()) {
                             enumBoxText.active = (enumeration as Enum<*>).ordinal
                         }
                     }

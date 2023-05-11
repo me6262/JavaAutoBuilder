@@ -1,8 +1,8 @@
 import java.io.File
 import java.util.ArrayList
 import java.util.regex.Pattern
-import java238.App
-import java238.background.RobotProject.Constants
+import frc238.App
+import frc238.background.RobotProject.Constants
 
 // gets the list of trajectories
 val trajectories = ArrayList<String>()

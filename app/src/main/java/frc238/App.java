@@ -1,21 +1,20 @@
-package java238;
+package frc238;
 
 import ch.bailu.gtk.adw.*;
 import ch.bailu.gtk.adw.ApplicationWindow;
 import ch.bailu.gtk.adw.HeaderBar;
-import ch.bailu.gtk.gdk.Gdk;
 import ch.bailu.gtk.gio.*;
 import ch.bailu.gtk.gtk.*;
 import ch.bailu.gtk.gtk.Application;
 import ch.bailu.gtk.type.Str;
 import ch.bailu.gtk.type.Strs;
 import ch.bailu.gtk.type.exception.AllocationError;
-import java238.background.Amode;
-import java238.background.RobotProject;
-import java238.plugins.PluginManager;
-import java238.widgets.AutoPicker;
-import java238.widgets.LoadFileDialog;
-import java238.widgets.Settings;
+import frc238.background.Amode;
+import frc238.background.RobotProject;
+import frc238.plugins.PluginManager;
+import frc238.widgets.AutoPicker;
+import frc238.widgets.LoadFileDialog;
+import frc238.widgets.Settings;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Paths;
@@ -157,7 +156,6 @@ public class App {
         picker.stack.setAmodeList(project.getAutoModes());
         try {
             project.indexCommands();
-            project.indexTrajectories();
             picker.commandSidebar.generateList();
 
         } catch (FileNotFoundException e) {

@@ -1,6 +1,5 @@
-package java238.widgets
+package frc238.widgets
 
-import ch.bailu.gtk.adw.Bin
 import ch.bailu.gtk.gdk.DragAction
 import ch.bailu.gtk.gio.File
 import ch.bailu.gtk.gobject.Value
@@ -9,11 +8,10 @@ import ch.bailu.gtk.gtk.Button
 import ch.bailu.gtk.gtk.DropTarget
 import ch.bailu.gtk.gtk.ListBox
 import ch.bailu.gtk.gtk.ScrolledWindow
-import ch.bailu.gtk.type.Str
-import java238.App
-import java238.background.Amode
-import java238.background.AmodeCommand
-import java238.background.CommandInfo
+import frc238.App
+import frc238.background.Amode
+import frc238.background.AmodeCommand
+import frc238.background.CommandInfo
 import java.util.function.Supplier
 
 class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {

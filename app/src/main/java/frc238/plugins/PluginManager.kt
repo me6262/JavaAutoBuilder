@@ -1,4 +1,4 @@
-package java238.plugins
+package frc238.plugins
 
 
 import java.io.File
@@ -14,11 +14,11 @@ import kotlin.collections.ArrayList
  */
 class PluginManager {
 
-    val plugins = HashMap<Boolean, Class<Plugin>>()
-    val allowedPlugins = HashMap<String, Pair<Boolean, Class<Plugin>>>()
+    val plugins = HashMap<Boolean, PluginData>()
+    val allowedPlugins = HashMap<String, Pair<Boolean, PluginData>>()
 
     init {
-        evalParameters("TrajectoryName")
+
     }
 
 

@@ -1,9 +1,9 @@
-package java238.widgets
+package frc238.widgets
 
 import ch.bailu.gtk.adw.*
 import ch.bailu.gtk.gtk.*
-import java238.App
-import java238.background.Amode
+import frc238.App
+import frc238.background.Amode
 
 class AutoPicker {
     @JvmField

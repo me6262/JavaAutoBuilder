@@ -1,14 +1,12 @@
-package java238.widgets;
+package frc238.widgets;
 
 import ch.bailu.gtk.adw.ActionRow;
-import ch.bailu.gtk.adw.Clamp;
 import ch.bailu.gtk.adw.Flap;
 import ch.bailu.gtk.adw.FlapFoldPolicy;
 import ch.bailu.gtk.adw.FoldThresholdPolicy;
-import ch.bailu.gtk.adw.PreferencesGroup;
 import ch.bailu.gtk.gtk.*;
-import java238.App;
-import java238.background.CommandInfo;
+import frc238.App;
+import frc238.background.CommandInfo;
 
 import java.util.List;
 

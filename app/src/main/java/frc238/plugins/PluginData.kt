@@ -1,4 +1,4 @@
-package java238.plugins
+package frc238.plugins
 
 data class PluginData(val parameterOpts: Array<String>, val pararameterName: String) {
     override fun equals(other: Any?): Boolean {

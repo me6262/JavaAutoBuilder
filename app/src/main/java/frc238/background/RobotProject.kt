@@ -1,14 +1,14 @@
 /**
  * loads the frc robot project and exposes methods to get basic info
  */
-package java238.background
+package frc238.background
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.sun.jna.Platform
-import java238.App
+import frc238.App
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
