@@ -82,16 +82,24 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
 
             //if this is the parameters that need the names of the trajectories
             if (App.settings.pluginsEnabled) {
-                //gets the pair from the hashmap and checks if the first element (boolean) is true
+                //gets the pair from the hashmap and checks if the first element (boolean) is true,
                 // meaning the plugin was enabled, if so, pluginClass = that class, else, null
                 if (App.plugins.allowedPlugins[paramName]?.first == true) {
+                    println("$paramName plugin")
                     val pluginComboBoxText = ComboBoxText()
                     for (str in App.plugins.allowedPlugins[paramName]!!.second.parameterOpts) {
-                        pluginComboBoxText.appendText(str)
+                        pluginComboBoxText.append(str, str)
                         if (str == parameter) {
-                            pluginComboBoxText.activeText = str
+                            pluginComboBoxText.activeId = Str(str)
                         }
                     }
+                    val prefRow = ActionRow().also {
+                        it.addSuffix(pluginComboBoxText)
+                        it.title = Str(paramName)
+                        addRow(it)
+                    }
+                    continue
+
                 }
             }
 

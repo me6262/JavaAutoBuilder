@@ -28,6 +28,9 @@ class Settings {
     private var prefWindow: PreferencesWindow = PreferencesWindow()
     private var preferencesGroup: PreferencesGroup = PreferencesGroup()
     private var preferencesPage: PreferencesPage = PreferencesPage()
+
+    private var pluginSettings: PreferencesGroup = PreferencesGroup()
+
     var wpilibVersion: String
         get() = json!!["wpilibVersion"].toString()
         set(value) {
@@ -99,7 +102,7 @@ class Settings {
         }
 
         val enablePlugins = ActionRow().also {
-            it.title = Str("Enable Plugins")
+            it.title = Str("Enable Plugins    (Requires app restart)")
             it.subtitle = Str("Used for special sources for parameters")
             it.addSuffix(pluginSwitch)
             preferencesGroup.add(it)
@@ -147,6 +150,11 @@ class Settings {
             classLoading = acessClassesSuffix.active
             pluginsEnabled = pluginSwitch.active
             saveSettings()
+        }
+
+        pluginSettings.title = Str("Plugins")
+        if (pluginsEnabled) {
+
         }
     }
 
