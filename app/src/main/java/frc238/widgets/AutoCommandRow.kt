@@ -96,6 +96,7 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
                     val prefRow = ActionRow().also {
                         it.addSuffix(pluginComboBoxText)
                         it.title = Str(paramName)
+                        parametersMap[paramName] = Supplier { pluginComboBoxText.activeText }
                         addRow(it)
                     }
                     continue
@@ -146,7 +147,7 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
                 parametersMap[paramName] = Supplier { entryRow.asEditable().text }
                 addRow(entryRow)
             } else {
-                entryRow.asEditable().setText(parameter)
+                entryRow.asEditable().text = Str(parameter)
                 parametersMap[paramName] = Supplier { entryRow.asEditable().text }
                 addRow(entryRow)
             }

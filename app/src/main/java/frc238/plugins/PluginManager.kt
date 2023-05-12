@@ -1,7 +1,9 @@
 package frc238.plugins
 
 
+import com.sun.jna.Platform
 import frc238.App
+import org.jetbrains.kotlin.cli.common.environment.setIdeaIoUseFallback
 import java.io.File
 import java.nio.file.Paths
 import java.util.*
@@ -20,10 +22,12 @@ class PluginManager {
 
     val plugins = HashMap<Boolean, PluginData>()
     val allowedPlugins = HashMap<String, Pair<Boolean, PluginData>>()
+    var hasLoadedPlugins = false
 
     init {
-        if (App.settings.pluginsEnabled) {
+        if (App.settings.pluginsEnabled && !App.project.rootDirectory.isNullOrEmpty()) {
             evalParameters()
+            hasLoadedPlugins = true
         }
     }
 
@@ -31,7 +35,8 @@ class PluginManager {
 
     private fun evalParameters(): Any? {
 
-        val folder = File(Paths.get("plugins/").toAbsolutePath().toUri())
+        setIdeaIoUseFallback()
+        val folder = File(Paths.get("plugins${if (Platform.isWindows()) "\\" else "/"}").toAbsolutePath().toUri())
 
         for (file in folder.listFiles()!!) {
             println(file.name)
