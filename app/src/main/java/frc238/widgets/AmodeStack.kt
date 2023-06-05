@@ -44,11 +44,6 @@ class AmodeStack : Stack() {
             App.header.packEnd(it)
         }
 
-        val rename = Button.newFromIconNameButton("document-edit-symbolic").also {
-            it.onClicked {renameMode()}
-            App.header.packStart(it)
-
-        }
 
         onNotify { signal: ParamSpec ->
             if (signal.name.toString() == "visible-child") {
@@ -71,7 +66,7 @@ class AmodeStack : Stack() {
             return amodeList
         }
 
-    private fun renameMode() {
+    public fun renameMode() {
         val namePop = Popover()
         val entry = Entry()
         namePop.child = entry

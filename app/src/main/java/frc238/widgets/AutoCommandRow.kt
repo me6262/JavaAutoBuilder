@@ -21,11 +21,12 @@ import java.util.function.Supplier
  * @see ExpanderRow
  *
  */
-class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
+class AutoCommandRow(modeIndex: Int) : ExpanderRow() {
     private var command: AmodeCommand? = null
     private val parametersMap = HashMap<String, Supplier<Str?>>()
     private lateinit var info: CommandInfo
     private val dnd: DragSource = DragSource()
+    public var visibleIndex: Int = modeIndex
 
     internal enum class ParallelType {
         Parallel, Race, Deadline_Leader, Deadline_Follower, None
@@ -40,6 +41,7 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
         dnd.onDragBegin { drag: Drag -> onDragBegin(drag) }
         dnd.onPrepare { v: Double, v1: Double -> onPrepare(v, v1) }
         expanded = false
+
 
 
 
@@ -168,7 +170,12 @@ class AutoCommandRow(val modeIndex: Int) : ExpanderRow() {
         parallelRow.setTitle("Parallel Type")
         parallelRow.setIconName("media-playlist-consecutive-symbolic")
         comboBoxText.active = type.ordinal
+        subtitle = when (comboBoxText.activeText.toString()) {
+            "None" -> Str.NULL
+            else -> comboBoxText.activeText
+        }
         comboBoxText.isSensitive = true
+        comboBoxText.onChanged { subtitle = if (comboBoxText.activeText.toString() == "None") Str.NULL else comboBoxText.activeText }
         parametersMap["ParallelType"] = Supplier { comboBoxText.activeText }
         addRow(parallelRow)
     }

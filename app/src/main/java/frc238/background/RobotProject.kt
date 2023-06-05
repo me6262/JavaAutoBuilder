@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.sun.jna.Platform
 import frc238.App
+import frc238.widgets.makeAndRunPopup
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -23,6 +24,7 @@ import java.util.regex.Pattern
 class RobotProject(var rootDirectory: String) {
     private val mapper: ObjectMapper = ObjectMapper()
     private var jsonString: String? = null
+    public var loadSuceeded = true
     var trajectories: ArrayList<String>? = null
         private set
 
@@ -32,6 +34,7 @@ class RobotProject(var rootDirectory: String) {
         mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
         if (rootDirectory.isNotEmpty()) {
             loadRobotProject()
+            println(jsonString)
 
         }
     }
@@ -92,9 +95,13 @@ class RobotProject(var rootDirectory: String) {
 
     fun loadRobotProject() {
         jsonString = try {
+            loadSuceeded = true
             Files.readString(Paths.get(rootDirectory + Constants.deployDirectory + Constants.amodeFile))
         } catch (e: IOException) {
-            throw RuntimeException(e)
+            e.printStackTrace()
+            loadSuceeded = false
+            makeAndRunPopup("No such File", "IOException")
+            null
         }
     }
 
@@ -107,7 +114,8 @@ class RobotProject(var rootDirectory: String) {
             try {
                 amodesList = mapper.readValue(jsonString, object : TypeReference<AmodeList?>() {})
             } catch (e: JsonProcessingException) {
-                throw RuntimeException(e)
+                e.printStackTrace()
+                makeAndRunPopup("There was a problem processing the json", "JSON could not be parsed")
             }
             amodesList
         }
@@ -120,7 +128,8 @@ class RobotProject(var rootDirectory: String) {
         try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(File(rootDirectory + Constants.deployDirectory + "amode238.txt"), amodesList)
         } catch (e: JsonProcessingException) {
-            throw RuntimeException(e)
+            e.printStackTrace()
+            makeAndRunPopup("there was a problem saving to the file", "JsonProcessingException")
         }
     }
 
@@ -136,15 +145,9 @@ class RobotProject(var rootDirectory: String) {
         val autoModeAnnotationRegex = "@AutonomousModeAnnotation\\(parameterNames = \\{(.*)}\\)"
     }
 
-    enum class OSName {
-        Unix, Windows
-    }
-
     companion object {
         private var amodesList: AmodeList? = null
         private val commands: MutableList<CommandInfo> = ArrayList()
-        val oSName: OSName
-            get() = if (System.getProperty("os.name").lowercase().contains("win")) OSName.Windows else OSName.Unix
     }
 
 }

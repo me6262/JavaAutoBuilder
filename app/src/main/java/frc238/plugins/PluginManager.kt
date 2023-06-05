@@ -25,7 +25,7 @@ class PluginManager {
     var hasLoadedPlugins = false
 
     init {
-        if (App.settings.pluginsEnabled && !App.project.rootDirectory.isNullOrEmpty()) {
+        if (App.settings.pluginsEnabled && App.project.loadSuceeded) {
             evalParameters()
             hasLoadedPlugins = true
         }

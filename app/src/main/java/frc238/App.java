@@ -88,6 +88,7 @@ public class App {
             app.asActionMap().addAction(propertiesAction.asAction());
 
 
+
             menubutton.setMenuModel(menu);
             header.packEnd(menubutton);
 
@@ -117,6 +118,9 @@ public class App {
             removeMode.onClicked(picker.stack::removeAmode);
             header.packStart(removeMode);
 
+            var rename = Button.newFromIconNameButton("document-edit-symbolic");
+            rename.onClicked(picker.stack::renameMode);
+            App.header.packStart(rename);
 
             window = new ApplicationWindow(app);
             window.setDirection(Orientation.VERTICAL);
@@ -135,7 +139,7 @@ public class App {
             window.setContent(vbox);
 
             window.present();
-            if (!settings.getProjectDir().isEmpty()) {
+            if (project.getLoadSuceeded()) {
                 initAutoList();
             }
         });

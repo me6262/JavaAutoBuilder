@@ -8,6 +8,7 @@ import ch.bailu.gtk.gtk.Button
 import ch.bailu.gtk.gtk.DropTarget
 import ch.bailu.gtk.gtk.ListBox
 import ch.bailu.gtk.gtk.ScrolledWindow
+import ch.bailu.gtk.gtk.SelectionMode
 import frc238.App
 import frc238.background.Amode
 import frc238.background.AmodeCommand
@@ -34,6 +35,8 @@ class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {
         target.onDrop { value: Value, v: Double, v1: Double -> onDrop(value, v, v1) }
         addController(target)
         hexpand = true
+        amodeCommands.addCssClass("boxed-list")
+        amodeCommands.selectionMode = SelectionMode.SINGLE
 //        vscrollbar.hide()
     }
 
@@ -52,7 +55,6 @@ class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {
     private fun setAuto(commandList: Amode) {
         focusOnClick = true
         mode = commandList
-        amodeCommands.addCssClass("boxed-list")
         amodeCommands.onMoveFocus {
             println(focusChild.name.toString())
             focusedCommandName = focusChild.name.toString()
@@ -103,9 +105,10 @@ class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {
 
     private fun removeCommand(row: AutoCommandRow) {
         val newCommands = mode.commands
-        newCommands.removeAt(row.modeIndex)
-        amodeCommandListMap.removeAt(row.modeIndex)
-        row.hide()
+        newCommands.removeAt(row.index)
+        amodeCommandListMap.removeAt(row.index)
+        mode.commands = newCommands
+        amodeCommands.remove(row)
     }
 
     /**
@@ -117,6 +120,7 @@ class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {
         if (index == 0) return
         val commlist = amodeCommandListMap[index].get().updatedCommandList
         val newRow = AutoCommandRow(index - 1)
+        
         if (commlist != null) {
             newRow.setParameterFields(commlist)
         }
@@ -128,21 +132,28 @@ class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {
         amodeCommands.remove(amodeCommands.getRowAtIndex(index))
         amodeCommands.insert(newRow, index - 1)
         amodeCommandListMap.removeAt(index)
+        for (command in amodeCommandListMap) {
+            if (command.get().visibleIndex < index) continue
+            val cmd = command.get()
+            cmd.visibleIndex -= 1
+        }
         amodeCommandListMap.add(index - 1, newRow::self)
         amodeCommands.activateOnSingleClick = true
         amodeCommands.selectRow(newRow)
-
     }
 
     fun moveRowDown() {
         val row = amodeCommands.selectedRow;
         val index: Int = row.index
+
         if (index >= amodeCommandListMap.size - 1) return
+
         val commlist = amodeCommandListMap[index].get().updatedCommandList
         val newRow = AutoCommandRow(index + 1)
         if (commlist != null) {
             newRow.setParameterFields(commlist)
         }
+
         val delete = Button.newFromIconNameButton("user-trash-symbolic")
         newRow.addPrefix(delete)
         delete.onClicked { removeCommand(newRow) }
@@ -151,6 +162,11 @@ class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {
         amodeCommands.remove(amodeCommands.getRowAtIndex(index))
         amodeCommands.insert(newRow, index + 1)
         amodeCommandListMap.removeAt(index)
+        for (command in amodeCommandListMap) {
+            if (command.get().visibleIndex < index) continue
+            val cmd = command.get()
+            cmd.visibleIndex -= 1
+        }
         amodeCommandListMap.add(index + 1, newRow::self)
         amodeCommands.activateOnSingleClick = true
         amodeCommands.selectRow(newRow)
