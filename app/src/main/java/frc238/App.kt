@@ -123,6 +123,8 @@ object App {
         val aboutMenu = AboutWindow()
         aboutMenu.application = app
         aboutMenu.addCreditSection("Developers", Strs(arrayOf("Hayden Mitchell")))
+        aboutMenu.applicationName = Str("Autonomous Builder")
+        aboutMenu.website = Str("frc238.org")
         aboutMenu.show()
     }
 

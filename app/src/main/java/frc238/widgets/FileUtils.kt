@@ -10,7 +10,6 @@ import frc238.App
 import frc238.App.initAutoList
 import org.jetbrains.kotlin.incremental.createDirectory
 import java.io.File
-import java.nio.file.Files
 
 
 var currentProjectFolder: String? = null
@@ -61,20 +60,22 @@ fun makeOrOpenXDGDataDir(): File {
         val homedir = System.getProperty("user.home") + "\\AppData\\Roaming"
         if (!File("$homedir\\AutoBuilder").isDirectory) {
             dir = File("$homedir\\AutoBuilder")
-            dir.mkdir()
+            dir.createDirectory()
             println(dir.path)
-            File("$homedir\\AutoBuilder\\plugins").mkdir()
-            val url = App.javaClass.classLoader.getResourceAsStream("plugins\\TrajectoryName.kts")
+            File("$homedir\\AutoBuilder\\plugins").createDirectory()
+            val url = App.javaClass.classLoader.getResourceAsStream("plugins/TrajectoryName.kts")
             val script = File(dir.path + "\\plugins\\TrajectoryName.kts")
-            script.createNewFile()
+            println( script.createNewFile())
             url!!.transferTo(script.outputStream())
+        } else {
+            dir = File("$homedir\\AutoBuilder")
         }
     }
     return dir!!
 }
 
 fun getOrCreateDataFile(localPath: String): File {
-    var file: File = File(makeOrOpenXDGDataDir().absolutePath + if (Platform.isWindows()) localPath.replace("/", "\\") else localPath)
+    var file: File = File(makeOrOpenXDGDataDir().absolutePath + localPath)
     println(file.path)
     if (file.isFile) {
         println("is File")
@@ -89,8 +90,8 @@ fun getOrCreateDataFile(localPath: String): File {
 }
 
 fun getPluginFolder(): File? {
-    println("returning ${makeOrOpenXDGDataDir().path}/plugins")
-    return File(makeOrOpenXDGDataDir().path + "/plugins")
+    println("returning ${makeOrOpenXDGDataDir().path}${File.separator}plugins")
+    return File("${makeOrOpenXDGDataDir().path}${File.separator}plugins")
 }
 
 
