@@ -3,7 +3,6 @@ package frc238.plugins
 
 import com.sun.jna.Platform
 import frc238.App
-import frc238.widgets.getPluginFolder
 import org.jetbrains.kotlin.cli.common.environment.setIdeaIoUseFallback
 import java.io.File
 import java.nio.file.Paths
@@ -35,8 +34,9 @@ class PluginManager {
 
 
     private fun evalParameters(): Any? {
+
         setIdeaIoUseFallback()
-        val folder = getPluginFolder()!!
+        val folder = File(Paths.get("plugins${if (Platform.isWindows()) "\\" else "/"}").toAbsolutePath().toUri())
 
         for (file in folder.listFiles()!!) {
             println(file.name)
@@ -49,5 +49,4 @@ class PluginManager {
         }
         return null
     }
-
 }

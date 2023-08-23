@@ -6,9 +6,7 @@ import ch.bailu.gtk.type.Str
 import frc238.App
 
 fun makeAndRunPopup(message: String, description: String) {
-    val popup = MessageDialog(App.window, message, description)
+    var popup = MessageDialog(App.window, message, description)
     popup.defaultResponse = Str("OK")
-
-    popup.addResponse("OK", "OK")
     popup.show()
 }

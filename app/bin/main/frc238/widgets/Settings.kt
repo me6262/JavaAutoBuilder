@@ -66,7 +66,10 @@ class Settings {
         try {
             BufferedReader(
                 FileReader(
-                        getOrCreateDataFile("/settings.json")
+                    if (Platform.isWindows())
+                        File("${Paths.get("").toAbsolutePath()}\\settings.json")
+                    else
+                        File("${Paths.get("").toAbsolutePath()}/settings.json")
                 )
             ).use { br ->
 
@@ -161,7 +164,7 @@ class Settings {
 
     fun saveSettings() {
         println(json)
-        val writer = FileWriter(getOrCreateDataFile("/settings.json").toPath().toString())
+        val writer = FileWriter(File(Paths.get("").toAbsolutePath().toString() + "${if (Platform.isWindows()) "\\" else "/"}settings.json").toPath().toString())
         writer.write(json!!.toJSONString())
         writer.flush()
     }
