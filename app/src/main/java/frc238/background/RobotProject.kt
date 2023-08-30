@@ -44,6 +44,9 @@ class RobotProject(var rootDirectory: String) {
         val dir = File(rootDirectory + Constants.commandDirectory)
         val directoryListing = dir.listFiles() ?: return
         for (child in directoryListing) {
+            if (child.isDirectory) {
+                continue
+            }
             val info: CommandInfo
             val params: Array<String?>
             val scanner = Scanner(child)
@@ -67,15 +70,23 @@ class RobotProject(var rootDirectory: String) {
             val paramsList: ArrayList<String?> = params.toMutableList() as ArrayList<String?>
             var parameterTypes: Array<Class<*>?> = Array(1){null}
             if (App.settings.classLoading) {
-            val urls: Array<URL> = Array(4){File("$rootDirectory/build/classes/java/main/").toURI().toURL()}
-            urls[1] =  File( "${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpilibj/wpilibj-java/${App.settings.wpilibVersion}/wpilibj-java-${App.settings.wpilibVersion}.jar/".apply {
+            
+                val urls: Array<URL> = Array(4){File("$rootDirectory/build/classes/java/main/").toURI().toURL()}
+
+                urls[1] =  File("${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpilibj/wpilibj-java/${App.settings.wpilibVersion}/wpilibj-java-${App.settings.wpilibVersion}.jar/".apply {
+
                 if (Platform.isWindows()) this.replace("/", "\\")
-            }).toURI().toURL()
-            urls[2] =  File( "${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpilibNewCommands/wpilibNewCommands-java/${App.settings.wpilibVersion}/wpilibNewCommands-java-${App.settings.wpilibVersion}.jar/".apply {
+
+                }).toURI().toURL()
+                urls[2] =  File( "${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpilibNewCommands/wpilibNewCommands-java/${App.settings.wpilibVersion}/wpilibNewCommands-java-${App.settings.wpilibVersion}.jar/".apply {
+                
                 if (Platform.isWindows()) this.replace("/", "\\")
-            }).toURI().toURL()
-            urls[3] =  File( "${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpiutil/wpiutil-java/${App.settings.wpilibVersion}/wpiutil-java-${App.settings.wpilibVersion}.jar/".apply {
+
+                }).toURI().toURL()
+                urls[3] =  File( "${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpiutil/wpiutil-java/${App.settings.wpilibVersion}/wpiutil-java-${App.settings.wpilibVersion}.jar/".apply {
+
                 if (Platform.isWindows()) this.replace("/", "\\")
+
             }).toURI().toURL()
             val loader: ClassLoader = URLClassLoader(urls)
             val loadedClass = loader.loadClass("frc.robot.commands.$name")
@@ -90,6 +101,9 @@ class RobotProject(var rootDirectory: String) {
             Companion.commands.add(info)
             println(info.name + " with parameters " + info.parameters.toString().strip())
         }
+        if (commands.isEmpty()) {
+            makeAndRunPopup("No commands found", "None were valid")
+        }
     }
 
 
@@ -100,8 +114,15 @@ class RobotProject(var rootDirectory: String) {
         } catch (e: IOException) {
             e.printStackTrace()
             loadSuceeded = false
-            makeAndRunPopup("No such File", "IOException")
-            null
+            makeAndRunPopup("amode238.txt is invalid", "IOException")
+            if (!File(rootDirectory + Constants.deployDirectory + Constants.amodeFile).exists()) {
+                var amode = File(rootDirectory + Constants.deployDirectory + Constants.amodeFile)
+                amode.createNewFile()
+                amode.writeText("{\"autoModes\":[]}")
+                amode.readText()
+            } else {
+                null
+            }
         }
     }
 
@@ -115,7 +136,7 @@ class RobotProject(var rootDirectory: String) {
                 amodesList = mapper.readValue(jsonString, object : TypeReference<AmodeList?>() {})
             } catch (e: JsonProcessingException) {
                 e.printStackTrace()
-                makeAndRunPopup("There was a problem processing the json", "JSON could not be parsed")
+                makeAndRunPopup("There was a problem processing the json", "JsonProcessingException")
             }
             amodesList
         }

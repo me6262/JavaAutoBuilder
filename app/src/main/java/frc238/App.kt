@@ -14,6 +14,7 @@ import frc238.plugins.PluginManager
 import frc238.widgets.AutoPicker
 import frc238.widgets.Settings
 import frc238.widgets.loadFolder
+import frc238.widgets.makeAndRunPopup
 import java.io.FileNotFoundException
 import java.nio.file.Paths
 
@@ -137,6 +138,8 @@ object App {
             picker.commandSidebar.generateList()
         } catch (e: FileNotFoundException) {
             println("Whoops, no file here!")
+            e.printStackTrace()
+            makeAndRunPopup("Error Finding Commands to Use", "FileNotFoundException")
         }
         picker.setModes(modes)
         println("dfghjkl")
