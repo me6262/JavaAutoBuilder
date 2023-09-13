@@ -11,6 +11,9 @@ the program makes a json file in your deploy directory that holds all of your au
 
 only java-based robot projects are supported at the moment. if you are savvy with c++ and kotlin, feel free to develop the c++ library as a part of the [AutoBuilderLib](https://github.com/me6262/AutoBuilderLib) project that goes with this.
 
+## Setting up your Robot Project
+the robot side of things is handled by the [AutoBuilderLib](https://github.com/me6262/AutoBuilderLib) vendordep conveniently created for this very purpose, so head over there to learn more
+
 
 ## Building the program on your own
 in case you would like to contribute to the project, or you want to test the main branch, this is the part of the guide for you.
@@ -32,7 +35,7 @@ pacman -S mingw-w64-x86_64-gtk4 mingw-w64-adwaita-icon-theme mingw-w64-libadwait
 3. then add the `bin`, `lib` and `include` directories of the msys2 install directory to your windows path
 4. this project should install all required gradle dependencies, although you may need to install jdk17 using your preferred method
 5. optionally, install wpilib, vscode is not required, only the libraries.
-## Set up development on Linux
+## Build on Linux distros
 #### NOTE: until flatpak support is added, only distros providing Libadwaita 44 and above are usable
 
 ### OpenSUSE Tumbleweed
