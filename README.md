@@ -9,11 +9,18 @@ Unfortunately, it had some minor annoyances with it, and the students who worked
 ## what does it do?
 the program makes a json file in your deploy directory that holds all of your autonomous modes. each entry is a list of commands, their parameters, and what (if any) mode of parallel it uses. optionally, if you have wpilib installed, and you wrote your code in java, you can use **THE POWER OF REFLECTION** to type check the parameters of the commands and change any entry fields that have an enum associated with them in your robot code to a drop-down of all of its possible values. additionally, if there is something that cannot be known at compile time, such as all of the possible trajectories in your pathplanner directory, you can add a handy-dandy .kts file into the plugins directory of the app to make your own custom source for dropdowns!
 
+only java-based robot projects are supported at the moment. if you are savvy with c++ and kotlin, feel free to develop the c++ library as a part of the [AutoBuilderLib](https://github.com/me6262/AutoBuilderLib) project that goes with this.
 
 
-## Set up for development on windows
+## Building the program on your own
+in case you would like to contribute to the project, or you want to test the main branch, this is the part of the guide for you.
 
-the easiest install method is using msys2.
+### Windows
+
+The program requires gtk-4 and libadwaita-1 as build dependencies
+
+the easiest method to get them without building gtk yourself is using msys2.
+
 
 1. install msys2 from their website, or from chocolatey
 2. open MinGW64.exe and run this:
@@ -22,7 +29,7 @@ the easiest install method is using msys2.
 pacman -S mingw-w64-x86_64-gtk4 mingw-w64-adwaita-icon-theme mingw-w64-libadwaita
 ```
 
-3. then add the `bin`, `lib` and `include` directories to your windows path
+3. then add the `bin`, `lib` and `include` directories of the msys2 install directory to your windows path
 4. this project should install all required gradle dependencies, although you may need to install jdk17 using your preferred method
 5. optionally, install wpilib, vscode is not required, only the libraries.
 ## Set up development on Linux
