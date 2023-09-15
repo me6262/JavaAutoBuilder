@@ -19,7 +19,7 @@ import java.util.function.Supplier
 class AmodeStack : Stack() {
     var amodeList: AmodeList? = null
     private var noneSelected: StatusPage = StatusPage()
-    private var editorWidgetSupplier: MutableMap<String, Supplier<AmodeEditorWidget>> = TreeMap()
+    private var editorWidgetSupplier: MutableMap<String, AmodeEditorWidget> = TreeMap()
     private var up: Button
     private var down: Button
 
@@ -53,14 +53,16 @@ class AmodeStack : Stack() {
     }
 
     private fun moveFocusedCommandDown() {
-        editorWidgetSupplier[visibleChild.name.toString()]!!.get().moveRowDown()
+        editorWidgetSupplier[visibleChild.name.toString()]!!.moveRowDown()
     }
 
     val updatedAmodesList: AmodeList?
         get() {
+            println("hi")
             val modesList = ArrayList<Amode>(editorWidgetSupplier.size)
             for (key in editorWidgetSupplier.keys) {
-                modesList.add(editorWidgetSupplier[key]!!.get().updatedMode)
+                println(key)
+                modesList.add(editorWidgetSupplier[key]!!.updatedMode)
             }
             amodeList!!.setAutonomousModes(modesList)
             return amodeList
@@ -72,10 +74,10 @@ class AmodeStack : Stack() {
         namePop.child = entry
         namePop.parent = App.title
         entry.onActivate {
-            val supp = editorWidgetSupplier.run {
+            editorWidgetSupplier.run {
 
                 getPage(visibleChild).title = entry.asEditable().text.also { getPage(visibleChild).name = it }
-                put(entry.asEditable().text.toString(), remove(visibleChild.name.toString())!!.also { it.get().name = visibleChildName })
+                put(entry.asEditable().text.toString(), remove(visibleChild.name.toString())!!.also { it.name = visibleChildName })
                 App.title.subtitle = entry.asEditable().text
                 namePop.hide()
             }
@@ -96,12 +98,12 @@ class AmodeStack : Stack() {
 
     fun addCommandToVisibleChild(info: CommandInfo?) {
         println(visibleChild.name.toString())
-        editorWidgetSupplier[visibleChild.name.toString()]!!.get().addCommand(info!!)
+        editorWidgetSupplier[visibleChild.name.toString()]!!.addCommand(info!!)
     }
 
     fun addTitled(widget: AmodeEditorWidget?, name: String) {
         super.addTitled(widget!!, name, name)
-        editorWidgetSupplier[name] = Supplier { widget.self }
+        editorWidgetSupplier[name] = widget
     }
 
     fun addAmodeToList() {
@@ -112,7 +114,7 @@ class AmodeStack : Stack() {
     }
 
     fun moveFocusedCommandUp() {
-        editorWidgetSupplier[visibleChild.name.toString()]!!.get().moveRowUp()
+        editorWidgetSupplier[visibleChild.name.toString()]!!.moveRowUp()
         println("WOAH")
     }
 }

@@ -4,6 +4,7 @@ import ch.bailu.gtk.gtk.FileChooserAction
 import ch.bailu.gtk.gtk.FileChooserDialog
 import ch.bailu.gtk.gtk.ResponseType
 import ch.bailu.gtk.type.Str
+import ch.bailu.gtk.gtk.Frame
 import ch.bailu.gtk.type.exception.AllocationError
 import com.sun.jna.Platform
 import frc238.App

@@ -10,10 +10,13 @@ import ch.bailu.gtk.gio.File
 import ch.bailu.gtk.gtk.*
 import ch.bailu.gtk.type.PointerContainer
 import ch.bailu.gtk.type.Str
+import ch.bailu.gtk.type.gobject.TypeSystem
 import frc238.App
 import frc238.background.AmodeCommand
 import frc238.background.CommandInfo
 import java.util.function.Supplier
+import com.sun.jna.Structure
+import org.jetbrains.kotlin.psi.psiUtil.getTrailingCommaByClosingElement
 
 /**
  * ExpanderRow that contains all the parameters of the command given to it (managed by AmodeEditorWidget)
@@ -21,16 +24,19 @@ import java.util.function.Supplier
  * @see ExpanderRow
  *
  */
-class AutoCommandRow(modeIndex: Int) : ExpanderRow() {
+class AutoCommandRow : ExpanderRow {
     private var command: AmodeCommand? = null
     private val parametersMap = HashMap<String, Supplier<Str?>>()
     private lateinit var info: CommandInfo
     private val dnd: DragSource = DragSource()
-    public var visibleIndex: Int = modeIndex
+    // public var visibleIndex: Int = modeIndex
 
     internal enum class ParallelType {
         Parallel, Race, Deadline_Leader, Deadline_Follower, None
     }
+
+    constructor(): super()
+
 
     init {
         focusable = true
@@ -41,16 +47,8 @@ class AutoCommandRow(modeIndex: Int) : ExpanderRow() {
         dnd.onDragBegin { drag: Drag -> onDragBegin(drag) }
         dnd.onPrepare { v: Double, v1: Double -> onPrepare(v, v1) }
         expanded = false
-
-
-
-
         onActivate { }
-
     }
-
-    val self: AutoCommandRow
-        get() = this
 
 
     /**
@@ -185,6 +183,7 @@ class AutoCommandRow(modeIndex: Int) : ExpanderRow() {
      */
     val updatedCommandList: AmodeCommand?
         get() {
+            println(parametersMap)
             val parameters = ArrayList<String>()
             if (info.parameters.size >= 1) {
                 for (i in info.parameters.indices) {
@@ -195,9 +194,11 @@ class AutoCommandRow(modeIndex: Int) : ExpanderRow() {
                 command!!.parallelType = parametersMap["ParallelType"]!!.get().toString()
             }
             command!!.setParameters(parameters)
-//            println("Set " + command!!.name)
+            println("Set " + command!!.name)
+            println(command!!.parameters)
             return command
         }
+
 
 
     /**
@@ -213,5 +214,8 @@ class AutoCommandRow(modeIndex: Int) : ExpanderRow() {
     private fun onPrepare(v: Double, v1: Double): ContentProvider {
         val file = File.newForPath(Str("src/main/resources/currentCommand.json"))
         return ContentProvider.newTypedContentProvider(File.getTypeID(), file.asCPointer())
+
     }
+
+
 }
