@@ -2,7 +2,6 @@ package frc238.widgets
 
 import ch.bailu.gtk.gtk.ListBox
 import ch.bailu.gtk.gtk.ListBoxRow
-import frc238.widgets.AutoCommandRow
 
 
 /**
@@ -17,22 +16,24 @@ class TypedListBox<T: ListBoxRow>() : ListBox() {
         commandsList += child
     }
 
+    // name += child
     operator fun plusAssign(child: T) {
         super.append(child)
         commandsList += child
     }
 
+    // name[index]
     operator fun get(index: Int): T {
         return commandsList[index]
     }
 
+    // name[index] = child
     operator fun set(index: Int, child: T) {
         commandsList[index] = child
-        child.ref()
-        super.remove(child)
         super.insert(child, index)
     }
 
+    // name -= child
     operator fun minusAssign(child: T) {
         super.remove(child)
         commandsList -= child
@@ -42,10 +43,12 @@ class TypedListBox<T: ListBoxRow>() : ListBox() {
         commandsList -= child
     }
 
+    // child in name
     operator fun contains(child: T): Boolean {
         return commandsList.contains(child)
     }
 
+    // iter in name
     operator fun iterator(): Iterator<T> {
         return commandsList.iterator()
     }

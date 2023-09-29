@@ -115,20 +115,34 @@ class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {
     fun moveRowUp() {
         val row = amodeCommands.selectedRowTyped;
         val index: Int = row.index
-        if (index == 0) return
+        if (index == 0 || index == -1) return
         row.ref()
-        amodeCommands.remove(row)
+        amodeCommands -= row
         amodeCommands[index - 1] = row
         amodeCommands.selectRow(row)
     }
 
     fun moveRowDown() {
+        println("moving row down")
         val row: AutoCommandRow = amodeCommands.selectedRowTyped;
+        println("got row")
         val index: Int = row.index
+        println("got index")
         row.ref()
-        amodeCommands.remove(row)
-        amodeCommands[index + 1] = row
+        println("refed row")
+        amodeCommands -= row
+        println("removed row")
+        if (index == amodeCommands.size()) {
+                
+                println("adding row")
+                amodeCommands += row
+                println("added row")
+        } else {
+            amodeCommands[index + 1] = row
+            println("set row at index")
+        }
         amodeCommands.selectRow(row)
+        println("selected row")
 
 
     }
