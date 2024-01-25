@@ -6,12 +6,12 @@ import frc238.background.RobotProject.Constants
 
 // gets the list of trajectories
 val trajectories = ArrayList<String>()
-val pattern = Pattern.compile((App.project.rootDirectory + Constants.deployDirectory + Constants.pathPlannerDir).replace("\\", "\\\\"))
+val pattern = Pattern.compile((App.project.rootDirectory + Constants.deployDirectory ).replace("\\", "\\\\")+ "choreo${File.separatorChar}")
 val dir = File(App.project.rootDirectory + Constants.deployDirectory + Constants.pathPlannerDir)
 val dirList = dir.listFiles()!!
 for (child in dirList) {
     println(child.name)
-    trajectories!!.add(child.name.split("\\.path".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0])
+    trajectories!!.add(child.name.split("\\.traj".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0])
 }
 
 //technically, this is an expression, which means awful things that i absolutely hate

@@ -96,4 +96,4 @@ fun getPluginFolder(): File? {
 }
 
 
-const val settingsTemplate = "{\"projectDir\":\"\",\"wpilibVersion\":\"2023.4.3\",\"pluginsEnabled\":false,\"wpilibDirectory\":\"\",\"canLoadClasses\":false}"
+const val settingsTemplate = "{\"projectDir\":\"\",\"wpilibVersion\":\"2024.1.1\",\"pluginsEnabled\":false,\"wpilibDirectory\":\"\",\"canLoadClasses\":false}"

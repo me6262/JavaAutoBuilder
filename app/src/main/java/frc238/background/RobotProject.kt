@@ -73,21 +73,9 @@ class RobotProject(var rootDirectory: String) {
             
                 val urls: Array<URL> = Array(4){File("$rootDirectory/build/classes/java/main/").toURI().toURL()}
 
-                urls[1] =  File("${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpilibj/wpilibj-java/${App.settings.wpilibVersion}/wpilibj-java-${App.settings.wpilibVersion}.jar/".apply {
-
-                if (Platform.isWindows()) this.replace("/", "\\")
-
-                }).toURI().toURL()
-                urls[2] =  File( "${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpilibNewCommands/wpilibNewCommands-java/${App.settings.wpilibVersion}/wpilibNewCommands-java-${App.settings.wpilibVersion}.jar/".apply {
-                
-                if (Platform.isWindows()) this.replace("/", "\\")
-
-                }).toURI().toURL()
-                urls[3] =  File( "${App.settings.wpiDirectory}/2023/maven/edu/wpi/first/wpiutil/wpiutil-java/${App.settings.wpilibVersion}/wpiutil-java-${App.settings.wpilibVersion}.jar/".apply {
-
-                if (Platform.isWindows()) this.replace("/", "\\")
-
-            }).toURI().toURL()
+                urls[1] =  File("${App.settings.wpiDirectory}/${App.settings.wpilibVersion.substring(0..4)}/maven/edu/wpi/first/wpilibj/wpilibj-java/${App.settings.wpilibVersion}/wpilibj-java-${App.settings.wpilibVersion}.jar/".replace('/', File.separatorChar)).toURI().toURL()
+                urls[2] =  File( "${App.settings.wpiDirectory}/${App.settings.wpilibVersion.substring(0..4)}/maven/edu/wpi/first/wpilibNewCommands/wpilibNewCommands-java/${App.settings.wpilibVersion}/wpilibNewCommands-java-${App.settings.wpilibVersion}.jar/".replace('/', File.separatorChar)).toURI().toURL()
+                urls[3] =  File( "${App.settings.wpiDirectory}/${App.settings.wpilibVersion.substring(0..4)}/maven/edu/wpi/first/wpiutil/wpiutil-java/${App.settings.wpilibVersion}/wpiutil-java-${App.settings.wpilibVersion}.jar/".replace('/', File.separatorChar)).toURI().toURL()
             val loader: ClassLoader = URLClassLoader(urls)
             val loadedClass = loader.loadClass("frc.robot.commands.$name")
             for (constructor in loadedClass.constructors) {
@@ -159,11 +147,11 @@ class RobotProject(var rootDirectory: String) {
 
     object Constants {
         val amodeFile = "amode238.txt"
-        val deployDirectory = if (Platform.isLinux()) "/src/main/deploy/" else "\\src\\main\\deploy\\"
-        val pathPlannerDir = if (Platform.isLinux()) "pathplanner/" else "pathplanner\\"
-        val commandDirectory = if (Platform.isLinux()) "/src/main/java/frc/robot/commands/" else "\\src\\main\\java\\frc\\robot\\commands\\"
-        val commandsRegex = if (Platform.isLinux()) ".*/(.*).java" else ".*\\\\(.*).java"
-        val pathFileRegex = if (Platform.isLinux()) ".*/(.*)\\.path" else ".*\\\\(.*)\\.path"
+        val deployDirectory = "/src/main/deploy/".replace('/', File.separatorChar)
+        val pathPlannerDir = "choreo/".replace('/', File.separatorChar)
+        val commandDirectory = "/src/main/java/frc/robot/commands/".replace('/', File.separatorChar)
+        val commandsRegex = ".*/(.*).java"
+        val pathFileRegex = ".*/(.*)\\.traj"
         val autoModeAnnotationRegex = "@AutonomousModeAnnotation\\(parameterNames = \\{(.*)}\\)"
     }
 
