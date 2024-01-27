@@ -29,6 +29,7 @@ object App {
     lateinit var plugins: PluginManager
     fun init() {
         settings = Settings()
+//        project = RobotProject()
         project = if (settings.projectDir != "") {
             RobotProject(settings.projectDir)
         } else {

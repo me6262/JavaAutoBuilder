@@ -23,12 +23,12 @@ class PluginManager {
 
     val plugins = HashMap<Boolean, PluginData>()
     val allowedPlugins = HashMap<String, Pair<Boolean, PluginData>>()
-    var hasLoadedPlugins = false
+    private var hasLoadedPlugins = false
 
     init {
         try {
 
-            if (App.settings.pluginsEnabled && App.project.loadSuceeded) {
+            if (App.settings.pluginsEnabled) {
                 evalParameters()
                 hasLoadedPlugins = true
             }

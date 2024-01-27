@@ -6,8 +6,8 @@ import frc238.background.RobotProject.Constants
 
 // gets the list of trajectories
 val trajectories = ArrayList<String>()
-val pattern = Pattern.compile((App.project.rootDirectory + Constants.deployDirectory ).replace("\\", "\\\\")+ "choreo${File.separatorChar}")
-val dir = File(App.project.rootDirectory + Constants.deployDirectory + Constants.pathPlannerDir)
+val pattern = Pattern.compile((App.project.rootDirectory + Constants.deployDirectory) + "choreo${File.separatorChar}")
+val dir = File(App.project.rootDirectory + Constants.deployDirectory + "choreo${File.separatorChar}")
 val dirList = dir.listFiles()!!
 for (child in dirList) {
     println(child.name)

@@ -2,6 +2,8 @@ package frc238.widgets
 
 import ch.bailu.gtk.gtk.ListBox
 import ch.bailu.gtk.gtk.ListBoxRow
+import ch.bailu.gtk.gtk.SelectionMode
+import javax.annotation.Nullable
 
 
 /**
@@ -10,7 +12,12 @@ import ch.bailu.gtk.gtk.ListBoxRow
 class TypedListBox<T: ListBoxRow>() : ListBox() {
 
     final var commandsList: ArrayList<T> = ArrayList<T>()
+    var lastSelectedRow: ListBoxRow? = null
 
+    init {
+
+        selectionMode = SelectionMode.SINGLE
+    }
     public fun append(child: T) {
         super.append(child)
         commandsList += child
@@ -57,9 +64,18 @@ class TypedListBox<T: ListBoxRow>() : ListBox() {
         return commandsList.size
     }
 
+    public override fun selectRow(@Nullable row: ListBoxRow?) {
+        unselectAll()
+        super.selectRow(row)
+        lastSelectedRow = row
+    }
     public val selectedRowTyped: T
         get() {
-            var row = super.getSelectedRow()
-            return commandsList[row.index]
+            val row = super.getSelectedRow()
+            if (row.index != -1) {
+                return commandsList[row.index]
+            } else {
+                return commandsList[lastSelectedRow!!.index]
+            }
         }
 }

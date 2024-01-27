@@ -118,7 +118,16 @@ class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {
         if (index == 0 || index == -1) return
         row.ref()
         amodeCommands -= row
-        amodeCommands[index - 1] = row
+        if (index <= 0) {
+
+            println("adding row")
+            amodeCommands += row
+            println("added row")
+        } else {
+            amodeCommands[index - 1] = row
+            println("set row at index")
+        }
+        row.unref()
         amodeCommands.selectRow(row)
     }
 
@@ -132,7 +141,7 @@ class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {
         println("refed row")
         amodeCommands -= row
         println("removed row")
-        if (index == amodeCommands.size()) {
+        if (index >= amodeCommands.size() - 1) {
                 
                 println("adding row")
                 amodeCommands += row
@@ -141,8 +150,9 @@ class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {
             amodeCommands[index + 1] = row
             println("set row at index")
         }
-        amodeCommands.selectRow(row)
+        row.unref()
         println("selected row")
+        amodeCommands.selectRow(row)
 
 
     }

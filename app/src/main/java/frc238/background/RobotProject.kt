@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.sun.jna.Platform
 import frc238.App
+import frc238.plugins.PluginManager
 import frc238.widgets.makeAndRunPopup
 import java.io.File
 import java.io.FileNotFoundException
@@ -24,7 +25,7 @@ import java.util.regex.Pattern
 class RobotProject(var rootDirectory: String) {
     private val mapper: ObjectMapper = ObjectMapper()
     private var jsonString: String? = null
-    public var loadSuceeded = true
+    public var loadSuceeded = false
     var trajectories: ArrayList<String>? = null
         private set
 
@@ -33,6 +34,7 @@ class RobotProject(var rootDirectory: String) {
     init {
         mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
         if (rootDirectory.isNotEmpty()) {
+//            App.plugins = PluginManager()
             loadRobotProject()
             println(jsonString)
 
@@ -73,9 +75,9 @@ class RobotProject(var rootDirectory: String) {
             
                 val urls: Array<URL> = Array(4){File("$rootDirectory/build/classes/java/main/").toURI().toURL()}
 
-                urls[1] =  File("${App.settings.wpiDirectory}/${App.settings.wpilibVersion.substring(0..4)}/maven/edu/wpi/first/wpilibj/wpilibj-java/${App.settings.wpilibVersion}/wpilibj-java-${App.settings.wpilibVersion}.jar/".replace('/', File.separatorChar)).toURI().toURL()
-                urls[2] =  File( "${App.settings.wpiDirectory}/${App.settings.wpilibVersion.substring(0..4)}/maven/edu/wpi/first/wpilibNewCommands/wpilibNewCommands-java/${App.settings.wpilibVersion}/wpilibNewCommands-java-${App.settings.wpilibVersion}.jar/".replace('/', File.separatorChar)).toURI().toURL()
-                urls[3] =  File( "${App.settings.wpiDirectory}/${App.settings.wpilibVersion.substring(0..4)}/maven/edu/wpi/first/wpiutil/wpiutil-java/${App.settings.wpilibVersion}/wpiutil-java-${App.settings.wpilibVersion}.jar/".replace('/', File.separatorChar)).toURI().toURL()
+                urls[1] =  File("${App.settings.wpiDirectory}/${App.settings.wpilibVersion.substring(0..4)}/maven/edu/wpi/first/wpilibj/wpilibj-java/${App.settings.wpilibVersion}/wpilibj-java-${App.settings.wpilibVersion}.jar".replace('/', File.separatorChar)).toURI().toURL()
+                urls[2] =  File( "${App.settings.wpiDirectory}/${App.settings.wpilibVersion.substring(0..4)}/maven/edu/wpi/first/wpilibNewCommands/wpilibNewCommands-java/${App.settings.wpilibVersion}/wpilibNewCommands-java-${App.settings.wpilibVersion}.jar".replace('/', File.separatorChar)).toURI().toURL()
+                urls[3] =  File( "${App.settings.wpiDirectory}/${App.settings.wpilibVersion.substring(0..4)}/maven/edu/wpi/first/wpiutil/wpiutil-java/${App.settings.wpilibVersion}/wpiutil-java-${App.settings.wpilibVersion}.jar".replace('/', File.separatorChar)).toURI().toURL()
             val loader: ClassLoader = URLClassLoader(urls)
             val loadedClass = loader.loadClass("frc.robot.commands.$name")
             for (constructor in loadedClass.constructors) {
