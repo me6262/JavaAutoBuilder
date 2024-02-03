@@ -4,22 +4,22 @@ import ch.bailu.gtk.adw.*
 import ch.bailu.gtk.gtk.*
 import frc238.App
 import frc238.background.Amode
+import frc238.background.CommandInfo
 
 class AutoPicker {
-    @JvmField
     var flap: Flap = Flap()
-    var sidebar: StackSidebar? = StackSidebar()
+    private var sidebar: StackSidebar? = StackSidebar()
 
-    @JvmField
     var stack: AmodeStack
-    @JvmField
-    var commandSidebar: CommandSidebar = CommandSidebar()
+
+    lateinit var commandSidebar: CommandSidebar
 
     init {
         sidebar?.addCssClass("background")
         val vbox = Box(Orientation.VERTICAL, 0)
         val bin = Bin()
         stack = AmodeStack()
+        commandSidebar = CommandSidebar()
         flap.run {
             foldThresholdPolicy = FoldThresholdPolicy.NATURAL
             foldPolicy = FlapFoldPolicy.AUTO
@@ -44,6 +44,7 @@ class AutoPicker {
             setMode(modeList)
         }
         flap.revealFlap = true
+        stack.setVisibleChildName(list.first()!!.name)
     }
 
     fun setMode(list: Amode?) {

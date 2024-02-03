@@ -25,22 +25,8 @@ class PluginManager {
     val allowedPlugins = HashMap<String, Pair<Boolean, PluginData>>()
     private var hasLoadedPlugins = false
 
-    init {
-        try {
 
-            if (App.settings.pluginsEnabled) {
-                evalParameters()
-                hasLoadedPlugins = true
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            App.settings.pluginsEnabled = false
-        }
-    }
-
-
-
-    private fun evalParameters(): Any? {
+    fun evalParameters(): Any? {
         setIdeaIoUseFallback()
         val folder = getPluginFolder()!!
 

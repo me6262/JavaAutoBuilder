@@ -120,6 +120,7 @@ class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {
         amodeCommands -= row
         if (index <= 0) {
 
+
             println("adding row")
             amodeCommands += row
             println("added row")
@@ -129,6 +130,7 @@ class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {
         }
         row.unref()
         amodeCommands.selectRow(row)
+        println(amodeCommands.size())
     }
 
     fun moveRowDown() {
@@ -141,7 +143,7 @@ class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {
         println("refed row")
         amodeCommands -= row
         println("removed row")
-        if (index >= amodeCommands.size() - 1) {
+        if (index >= amodeCommands.size()) {
                 
                 println("adding row")
                 amodeCommands += row
@@ -153,8 +155,7 @@ class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {
         row.unref()
         println("selected row")
         amodeCommands.selectRow(row)
-
-
+        println(amodeCommands.size())
     }
 
     private fun onDrop(value: Value, v: Double, v1: Double): Boolean {

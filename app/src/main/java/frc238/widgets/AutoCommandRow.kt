@@ -189,6 +189,8 @@ class AutoCommandRow : ExpanderRow {
                 for (i in info.parameters.indices) {
                     if (parametersMap[info.parameters[i]?.removeSurrounding("\"")]?.get() != null) {
                         parameters.add(parametersMap[info.parameters[i]?.removeSurrounding("\"")]?.get().toString())
+                    } else {
+                        parameters.add("")
                     }
                 }
                 command!!.parallelType = parametersMap["ParallelType"]!!.get().toString()

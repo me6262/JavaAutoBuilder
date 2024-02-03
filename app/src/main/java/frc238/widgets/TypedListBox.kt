@@ -11,7 +11,7 @@ import javax.annotation.Nullable
  */
 class TypedListBox<T: ListBoxRow>() : ListBox() {
 
-    final var commandsList: ArrayList<T> = ArrayList<T>()
+    var commandsList: ArrayList<T> = ArrayList()
     var lastSelectedRow: ListBoxRow? = null
 
     init {
@@ -20,6 +20,7 @@ class TypedListBox<T: ListBoxRow>() : ListBox() {
     }
     public fun append(child: T) {
         super.append(child)
+        size()
         commandsList += child
     }
 
@@ -36,7 +37,7 @@ class TypedListBox<T: ListBoxRow>() : ListBox() {
 
     // name[index] = child
     operator fun set(index: Int, child: T) {
-        commandsList[index] = child
+        commandsList.add(index, child)
         super.insert(child, index)
     }
 
@@ -49,6 +50,7 @@ class TypedListBox<T: ListBoxRow>() : ListBox() {
         super.remove(child)
         commandsList -= child
     }
+
 
     // child in name
     operator fun contains(child: T): Boolean {
@@ -64,6 +66,7 @@ class TypedListBox<T: ListBoxRow>() : ListBox() {
         return commandsList.size
     }
 
+
     public override fun selectRow(@Nullable row: ListBoxRow?) {
         unselectAll()
         super.selectRow(row)
@@ -72,10 +75,10 @@ class TypedListBox<T: ListBoxRow>() : ListBox() {
     public val selectedRowTyped: T
         get() {
             val row = super.getSelectedRow()
-            if (row.index != -1) {
-                return commandsList[row.index]
+            return if (row.index != -1) {
+                commandsList[row.index]
             } else {
-                return commandsList[lastSelectedRow!!.index]
+                commandsList[lastSelectedRow!!.index]
             }
         }
 }

@@ -29,12 +29,6 @@ object App {
     lateinit var plugins: PluginManager
     fun init() {
         settings = Settings()
-//        project = RobotProject()
-        project = if (settings.projectDir != "") {
-            RobotProject(settings.projectDir)
-        } else {
-            RobotProject()
-        }
         plugins = PluginManager()
     }
 
@@ -51,8 +45,10 @@ object App {
         } catch (e: AllocationError) {
             throw RuntimeException(e)
         }
-        picker = AutoPicker()
         app.onActivate {
+
+            project = RobotProject()
+            picker = AutoPicker()
             title = WindowTitle("Autonomous Builder", "")
             StyleManager.getDefault().colorScheme = ColorScheme.FORCE_DARK
             header.titleWidget = title
@@ -114,9 +110,6 @@ object App {
             window.setDefaultSize(900, 800)
             window.content = vbox
             window.present()
-            if (project.loadSuceeded) {
-                initAutoList()
-            }
         }
         app.run(args.size, Strs(args))
     }
@@ -135,12 +128,21 @@ object App {
         val modes = project.autoModes!!.autonomousModes
         picker.stack.amodeList = project.autoModes
         try {
+            if (settings.pluginsEnabled) {
+                plugins.evalParameters()
+            }
+        } catch (e: Error) {
+           e.printStackTrace()
+        }
+        try {
+
             project.indexCommands()
             picker.commandSidebar.generateList()
         } catch (e: FileNotFoundException) {
             println("Whoops, no file here!")
             e.printStackTrace()
-            makeAndRunPopup("Error Finding Commands to Use", "FileNotFoundException")
+            makeAndRunPopup("Error Finding Commands to Use", "disabling class loading for next run")
+            settings.classLoading = false
         }
         picker.setModes(modes)
         println("dfghjkl")

@@ -7,9 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.sun.jna.Platform
 import frc238.App
-import frc238.plugins.PluginManager
 import frc238.widgets.makeAndRunPopup
 import java.io.File
 import java.io.FileNotFoundException
@@ -25,9 +23,11 @@ import java.util.regex.Pattern
 class RobotProject(var rootDirectory: String) {
     private val mapper: ObjectMapper = ObjectMapper()
     private var jsonString: String? = null
-    public var loadSuceeded = false
+    private var loadSucceeded = false
     var trajectories: ArrayList<String>? = null
         private set
+
+    lateinit var WPILibClassLoader: URLClassLoader
 
     constructor() : this("")
 
@@ -35,11 +35,12 @@ class RobotProject(var rootDirectory: String) {
         mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
         if (rootDirectory.isNotEmpty()) {
 //            App.plugins = PluginManager()
-            loadRobotProject()
+            loadJson()
             println(jsonString)
 
         }
     }
+
     @Throws(FileNotFoundException::class)
     fun indexCommands() {
         val pattern = Pattern.compile(Constants.autoModeAnnotationRegex)
@@ -53,10 +54,10 @@ class RobotProject(var rootDirectory: String) {
             val params: Array<String?>
             val scanner = Scanner(child)
             var line = scanner.nextLine()
-            var commandConstructor : Constructor<*>? = null
+            var commandConstructor: Constructor<*>? = null
             var foundAnnotation: Boolean = false
             var paramClasses = arrayListOf<Class<Any>>()
-            var findPattern:String? = null
+            var findPattern: String? = null
             // Do something with child
             while (scanner.hasNextLine()) {
                 line = scanner.nextLine()
@@ -67,25 +68,24 @@ class RobotProject(var rootDirectory: String) {
 
             val name = child.name.substring(0, child.name.length - 5)
 
-            params = findPattern!!.substring(44, findPattern.length - 2).split(", ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            params = findPattern!!
+                    .substring(44, findPattern.length - 2)
+                    .split(", ".toRegex())
+                    .dropLastWhile { it.isEmpty() }
+                    .toTypedArray()
 
             val paramsList: ArrayList<String?> = params.toMutableList() as ArrayList<String?>
-            var parameterTypes: Array<Class<*>?> = Array(1){null}
+            var parameterTypes: Array<Class<*>?> = Array(1) { null }
             if (App.settings.classLoading) {
-            
-                val urls: Array<URL> = Array(4){File("$rootDirectory/build/classes/java/main/").toURI().toURL()}
 
-                urls[1] =  File("${App.settings.wpiDirectory}/${App.settings.wpilibVersion.substring(0..4)}/maven/edu/wpi/first/wpilibj/wpilibj-java/${App.settings.wpilibVersion}/wpilibj-java-${App.settings.wpilibVersion}.jar".replace('/', File.separatorChar)).toURI().toURL()
-                urls[2] =  File( "${App.settings.wpiDirectory}/${App.settings.wpilibVersion.substring(0..4)}/maven/edu/wpi/first/wpilibNewCommands/wpilibNewCommands-java/${App.settings.wpilibVersion}/wpilibNewCommands-java-${App.settings.wpilibVersion}.jar".replace('/', File.separatorChar)).toURI().toURL()
-                urls[3] =  File( "${App.settings.wpiDirectory}/${App.settings.wpilibVersion.substring(0..4)}/maven/edu/wpi/first/wpiutil/wpiutil-java/${App.settings.wpilibVersion}/wpiutil-java-${App.settings.wpilibVersion}.jar".replace('/', File.separatorChar)).toURI().toURL()
-            val loader: ClassLoader = URLClassLoader(urls)
-            val loadedClass = loader.loadClass("frc.robot.commands.$name")
-            for (constructor in loadedClass.constructors) {
-                if (constructor.parameterCount == params.size) {
-                    commandConstructor = constructor
+                reloadWPILibClassLoader()
+                val loadedClass = WPILibClassLoader.loadClass("frc.robot.commands.$name")
+                for (constructor in loadedClass.constructors) {
+                    if (constructor.parameterCount == params.size) {
+                        commandConstructor = constructor
+                    }
                 }
-            }
-            parameterTypes = commandConstructor!!.parameterTypes
+                parameterTypes = commandConstructor!!.parameterTypes
             }
             info = CommandInfo(name, paramsList, parameterTypes)
             Companion.commands.add(info)
@@ -97,16 +97,16 @@ class RobotProject(var rootDirectory: String) {
     }
 
 
-    fun loadRobotProject() {
+    fun loadJson() {
         jsonString = try {
-            loadSuceeded = true
+            loadSucceeded = true
             Files.readString(Paths.get(rootDirectory + Constants.deployDirectory + Constants.amodeFile))
         } catch (e: IOException) {
             e.printStackTrace()
-            loadSuceeded = false
+            loadSucceeded = false
             makeAndRunPopup("amode238.txt is invalid", "IOException")
             if (!File(rootDirectory + Constants.deployDirectory + Constants.amodeFile).exists()) {
-                var amode = File(rootDirectory + Constants.deployDirectory + Constants.amodeFile)
+                val amode = File(rootDirectory + Constants.deployDirectory + Constants.amodeFile)
                 amode.createNewFile()
                 amode.writeText("{\"autoModes\":[]}")
                 amode.readText()
@@ -137,13 +137,18 @@ class RobotProject(var rootDirectory: String) {
 
     private fun saveOut() {
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(File(rootDirectory + Constants.deployDirectory + "amode238.txt"), amodesList)
+            mapper.writerWithDefaultPrettyPrinter()
+                .writeValue(File(rootDirectory + Constants.deployDirectory + "amode238.txt"), amodesList)
         } catch (e: JsonProcessingException) {
             e.printStackTrace()
             makeAndRunPopup("there was a problem saving to the file", "JsonProcessingException")
         }
     }
 
+    private fun reloadWPILibClassLoader() {
+        val urls: Array<URL> = Array(1) { File("$rootDirectory/build/libs").listFiles()?.first()!!.toURI().toURL() }
+        WPILibClassLoader = URLClassLoader(urls)
+    }
 
     fun tempSaveDraggedCommand() {}
 

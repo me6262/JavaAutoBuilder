@@ -4,7 +4,6 @@ import ch.bailu.gtk.gtk.FileChooserAction
 import ch.bailu.gtk.gtk.FileChooserDialog
 import ch.bailu.gtk.gtk.ResponseType
 import ch.bailu.gtk.type.Str
-import ch.bailu.gtk.gtk.Frame
 import ch.bailu.gtk.type.exception.AllocationError
 import com.sun.jna.Platform
 import frc238.App
@@ -13,7 +12,7 @@ import org.jetbrains.kotlin.incremental.createDirectory
 import java.io.File
 
 
-var currentProjectFolder: String? = null
+private var currentProjectFolder: String? = null
 lateinit var chooser: FileChooserDialog
 fun loadFolder() {
     chooser = FileChooserDialog("Stuff", App.window, FileChooserAction.SELECT_FOLDER, "Open", ResponseType.ACCEPT)
@@ -23,14 +22,14 @@ fun loadFolder() {
             currentProjectFolder = chooser.asFileChooser().currentFolder.parseName.toString()
             println(currentProjectFolder)
             App.project.rootDirectory = currentProjectFolder!!
-            App.project.loadRobotProject()
+            App.project.loadJson()
             chooser.destroy()
             initAutoList()
             App.settings.projectDir = currentProjectFolder!!
             App.settings.saveSettings()
         }
     }
-    val startPath = ch.bailu.gtk.gio.File.newForPath(Str("~/"))
+    val startPath = ch.bailu.gtk.gio.File.newForPath(Str(System.getProperty("user.home")))
     try {
         chooser.asFileChooser().setCurrentFolder(startPath)
     } catch (e: AllocationError) {
