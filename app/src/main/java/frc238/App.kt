@@ -33,6 +33,7 @@ import java.io.FileNotFoundException
 import java.nio.file.Paths
 
 object App {
+    // FIXME avoid global variables
     lateinit var picker: AutoPicker
     lateinit var app: Application
     lateinit var window: ApplicationWindow
@@ -41,29 +42,42 @@ object App {
     lateinit var title: WindowTitle
     lateinit var settings: Settings
     lateinit var plugins: PluginManager
-    fun init() {
+    private fun init() {
         settings = Settings()
         plugins = PluginManager()
     }
 
     @JvmStatic
     fun main(args: Array<String>) {
+        // Adw.init() // This call should not be necessary if you use adw.Application instead of gtk.Application
         app = Application("org.frc238.autoBuilder", ApplicationFlags.FLAGS_NONE)
-        init()
-        header = HeaderBar()
-        header.addCssClass("flat")
+
+        /*
+        FIXME This works only with compiled resources
+        Compile with `glib-compile-resources` application that is part of the gtk distribution
+        See Adwaita example in java-gtk
+        there is also a helper function to load compiled resource files: GResource.loadAndRegister("path/to/compiled.gresources")
+        */
         val gresource = File.newForPath(Str("icons/resources.gresource.xml"))
         try {
             Gio.resourceLoad(gresource.path)
         } catch (e: AllocationError) {
             throw RuntimeException(e)
         }
+
+        // This could cause crashes
+        StyleManager.getDefault().colorScheme = ColorScheme.FORCE_DARK
+
         app.onActivate {
+
+            init() // Load widgets here (after app.run())
+
+            header = HeaderBar()
+            header.addCssClass("flat")
 
             project = RobotProject()
             picker = AutoPicker()
             title = WindowTitle("Autonomous Builder", "")
-            StyleManager.getDefault().colorScheme = ColorScheme.FORCE_DARK
             header.titleWidget = title
             val cssProvider = CssProvider()
             val toggleCommandFlap = Button()
