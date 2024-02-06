@@ -1,11 +1,25 @@
 package frc238
 
-import ch.bailu.gtk.adw.*
+import ch.bailu.gtk.adw.AboutWindow
+import ch.bailu.gtk.adw.Application
 import ch.bailu.gtk.adw.ApplicationWindow
+import ch.bailu.gtk.adw.ColorScheme
 import ch.bailu.gtk.adw.HeaderBar
-import ch.bailu.gtk.gio.*
-import ch.bailu.gtk.gtk.*
-import ch.bailu.gtk.gtk.Application
+import ch.bailu.gtk.adw.StyleManager
+import ch.bailu.gtk.adw.ToastPriority
+import ch.bailu.gtk.adw.WindowTitle
+import ch.bailu.gtk.gio.ApplicationFlags
+import ch.bailu.gtk.gio.File
+import ch.bailu.gtk.gio.Gio
+import ch.bailu.gtk.gio.Menu
+import ch.bailu.gtk.gio.MenuItem
+import ch.bailu.gtk.gio.SimpleAction
+import ch.bailu.gtk.gtk.Box
+import ch.bailu.gtk.gtk.Button
+import ch.bailu.gtk.gtk.CssProvider
+import ch.bailu.gtk.gtk.MenuButton
+import ch.bailu.gtk.gtk.Orientation
+import ch.bailu.gtk.gtk.StyleContext
 import ch.bailu.gtk.type.Str
 import ch.bailu.gtk.type.Strs
 import ch.bailu.gtk.type.exception.AllocationError
@@ -34,7 +48,6 @@ object App {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        Adw.init()
         app = Application("org.frc238.autoBuilder", ApplicationFlags.FLAGS_NONE)
         init()
         header = HeaderBar()
