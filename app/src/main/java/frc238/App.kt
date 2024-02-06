@@ -117,7 +117,7 @@ object App {
     private fun showAboutWindow() {
         val aboutMenu = AboutWindow()
         aboutMenu.application = app
-        aboutMenu.addCreditSection("Developers", Strs(arrayOf("Hayden Mitchell")))
+        aboutMenu.addCreditSection("Developers", Strs(arrayOf("Hayden Mitchell", null)))
         aboutMenu.applicationName = Str("Autonomous Builder")
         aboutMenu.website = Str("frc238.org")
         aboutMenu.show()
