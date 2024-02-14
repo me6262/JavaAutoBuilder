@@ -5,3 +5,8 @@
 build/
 app/build/
 app/bin/
+appimage-build/
+AppDir/
+*.log
+*.AppImage
+*.zsync

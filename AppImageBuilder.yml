@@ -1,0 +1,60 @@
+# appimage-builder recipe see https://appimage-builder.readthedocs.io for details
+version: 1
+script:
+  - rm -rf AppDir | true
+
+  - mkdir -p AppDir/usr/bin
+  - mkdir -p AppDir/usr/bin
+  - mkdir -p AppDir/usr/app/bin
+  - mkdir -p AppDir/usr/app/lib
+  - ./gradlew distTar && tar -xvf app/build/distributions/app.tar -C AppDir/usr/ --strip-components=1
+  - chmod +x AppDir/usr/bin/app
+AppDir:
+  path: ./AppDir
+  app_info:
+    id: org.frc238.JavaAutoBuilder
+    name: AutoBuilder
+    icon: application-vnd.appimage
+    version: 0.2.0
+    exec: bin/bash
+    exec_args: "$APPDIR/usr/bin/app $@" 
+  apt:
+    arch: 
+      - amd64
+    allow_unauthenticated: true
+    sources:
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ jammy main restricted universe
+        multiverse
+    include: 
+      - libadwaita-1-0
+      - openjdk-17-jre
+      - bash
+      - gsettings-desktop-schemas
+      - perl
+      - dash
+    exclude:
+      - adwaita-icon-theme
+  files:
+    include: []
+    exclude:
+    - usr/share/man
+    - usr/share/doc
+  test:
+    fedora-30:
+      image: appimagecrafters/tests-env:fedora-30
+      command: ./AppRun
+    debian-stable:
+      image: appimagecrafters/tests-env:debian-stable
+      command: ./AppRun
+    archlinux-latest:
+      image: appimagecrafters/tests-env:archlinux-latest
+      command: ./AppRun
+    centos-7:
+      image: appimagecrafters/tests-env:centos-7
+      command: ./AppRun
+    ubuntu-xenial:
+      image: appimagecrafters/tests-env:ubuntu-xenial
+      command: ./AppRun
+AppImage:
+  arch: x86_64
+  update-information: guess
