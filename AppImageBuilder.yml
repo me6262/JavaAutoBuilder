@@ -5,8 +5,8 @@ script:
 
   - mkdir -p AppDir/usr/bin
   - mkdir -p AppDir/usr/bin
-  - mkdir -p AppDir/usr/app/bin
-  - mkdir -p AppDir/usr/app/lib
+  - echo "echo workin on it; cd \$APPDIR/usr/bin; source \$APPDIR/AppRun.env; app" > AppDir/usr/bin/runmyapp
+  - chmod +x AppDir/usr/bin/runmyapp
   - ./gradlew distTar && tar -xvf app/build/distributions/app.tar -C AppDir/usr/ --strip-components=1
   - chmod +x AppDir/usr/bin/app
 AppDir:
@@ -17,14 +17,15 @@ AppDir:
     icon: application-vnd.appimage
     version: 0.2.0
     exec: bin/bash
-    exec_args: "$APPDIR/usr/bin/app $@" 
+    exec_args: runmyapp
   apt:
     arch: 
       - amd64
     allow_unauthenticated: true
     sources:
-    - sourceline: deb http://archive.ubuntu.com/ubuntu/ jammy main restricted universe
-        multiverse
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ lunar main restricted universe multiverse
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ lunar-backports main restricted universe multiverse
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ lunar-updates main restricted universe multiverse
     include: 
       - libadwaita-1-0
       - openjdk-17-jre
@@ -32,13 +33,38 @@ AppDir:
       - gsettings-desktop-schemas
       - perl
       - dash
-    exclude:
       - adwaita-icon-theme
+
+      - libx11-6
+      - libgl1
+      - libglapi-mesa
+      - libdrm2
+      - libegl1
+      - libxcb-shape0
+      - libxcb1
+      - libx11-xcb1
+      - fontconfig-config
+      - libfontconfig1
+      - libfreetype6
+      - libglx0
+      - libxcb-xfixes0
+      - libxcb-render0
+      - libxcb-glx0
+      - libxcb-shm0
+      - libglvnd0
+      - libxcb-dri3-0
+      - libxcb-dri2-0
+      - libxcb-present0
+    exclude: 
+      - libgtk2.0-0
   files:
     include: []
     exclude:
     - usr/share/man
     - usr/share/doc
+  runtime:  
+    env:
+      APPDIR_LIBRARY_PATH: $APPDIR/lib/x86_64-linux-gnu:$APPDIR/usr/lib/x86_64-linux-gnu:$APPDIR/usr/lib/x86_64-linux-gnu/pulseaudio
   test:
     fedora-30:
       image: appimagecrafters/tests-env:fedora-30
