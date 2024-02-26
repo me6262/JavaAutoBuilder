@@ -22,6 +22,8 @@ class AmodeStack : Stack() {
     private var editorWidgetSupplier: MutableMap<String, AmodeEditorWidget> = TreeMap()
     private var up: Button
     private var down: Button
+    //counter used to correctly number autos labelled as "New Auto (n)" with n being the number called that
+    private var unnamedCount = 0
 
     init {
         val action = SimpleAction("move-up", null)
@@ -76,16 +78,22 @@ class AmodeStack : Stack() {
         entry.onActivate {
             editorWidgetSupplier.run {
 
-                getPage(visibleChild).title = entry.asEditable().text.also { getPage(visibleChild).name = it }
-                put(entry.asEditable().text.toString(), remove(visibleChild.name.toString())!!.also { it.name = visibleChildName })
-                App.title.subtitle = entry.asEditable().text
+                val oldName = getPage(visibleChild).name.toString()
+                val newName = entry.asEditable().text
+                getPage(visibleChild).title = newName
+                getPage(visibleChild).name = newName
+                val oldMode = remove(oldName)
+                oldMode!!.modeName = newName.toString()
+                put(newName.toString(), oldMode)
+                App.title.subtitle = newName
+                println("new name: $newName")
+                println("old name: $oldName")
                 namePop.hide()
             }
         }
         entry.asEditable().text = visibleChildName
         namePop.popdown()
         namePop.show()
-        println("woah")
     }
     fun removeAmode() {
         editorWidgetSupplier.remove(visibleChildName.toString())
@@ -97,8 +105,8 @@ class AmodeStack : Stack() {
     }
 
     fun addCommandToVisibleChild(info: CommandInfo?) {
-        println(visibleChild.name.toString())
-        editorWidgetSupplier[visibleChild.name.toString()]!!.addCommand(info!!)
+        println(getPage(visibleChild).title.toString())
+        editorWidgetSupplier[getPage(visibleChild).title.toString()]!!.addCommand(info!!)
     }
 
     fun addTitled(widget: AmodeEditorWidget?, name: String) {
@@ -114,7 +122,7 @@ class AmodeStack : Stack() {
     }
 
     fun moveFocusedCommandUp() {
-        editorWidgetSupplier[visibleChild.name.toString()]!!.moveRowUp()
+        editorWidgetSupplier[getPage(visibleChild).title.toString()]!!.moveRowUp()
         println("WOAH")
     }
 }

@@ -23,7 +23,7 @@ class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {
     private var focusedCommandName: String? = null
     private var amodeCommands: TypedListBox<AutoCommandRow> = TypedListBox<AutoCommandRow>()
 
-    val modeName: String
+    var modeName: String
     private lateinit var mode: Amode
     private var target: DropTarget
 
@@ -45,17 +45,18 @@ class AmodeEditorWidget(commandList: Amode) : ScrolledWindow() {
             println("updated mode")
             println(amodeCommands.size())
             for (i in amodeCommands) {
-                println("stuff")
                 commands += i.updatedCommandList!!
-                println(i.updatedCommandList)
+                println(" - ${i.updatedCommandList?.name}")
 
             }
+            mode.name = modeName
             mode.commands = commands
             return mode
 
         }
 
     private fun setAuto(commandList: Amode) {
+        println(commandList.name)
         focusOnClick = true
         mode = commandList
         amodeCommands.onMoveFocus {

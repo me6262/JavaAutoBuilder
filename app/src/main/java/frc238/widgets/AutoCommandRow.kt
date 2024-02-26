@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.psi.psiUtil.getTrailingCommaByClosingElement
  * @see ExpanderRow
  *
  */
-class AutoCommandRow : ExpanderRow {
+class AutoCommandRow() : ExpanderRow() {
     private var command: AmodeCommand? = null
     private val parametersMap = HashMap<String, Supplier<Str?>>()
     private lateinit var info: CommandInfo
@@ -34,8 +34,6 @@ class AutoCommandRow : ExpanderRow {
     internal enum class ParallelType {
         Parallel, Race, Deadline_Leader, Deadline_Follower, None
     }
-
-    constructor(): super()
 
 
     init {
@@ -61,6 +59,7 @@ class AutoCommandRow : ExpanderRow {
         this.command = command
         setName(command.name)
         setTitle(command.name)
+        println(command.name)
         val commands = App.project.commands
         for (commandInfo in commands) {
             if (commandInfo.name == command.name) {
@@ -183,7 +182,7 @@ class AutoCommandRow : ExpanderRow {
      */
     val updatedCommandList: AmodeCommand?
         get() {
-            println(parametersMap)
+//            println(parametersMap)
             val parameters = ArrayList<String>()
             if (info.parameters.size >= 1) {
                 for (i in info.parameters.indices) {
@@ -193,11 +192,13 @@ class AutoCommandRow : ExpanderRow {
                         parameters.add("")
                     }
                 }
-                command!!.parallelType = parametersMap["ParallelType"]!!.get().toString()
             }
+            command!!.parallelType = parametersMap["ParallelType"]!!.get().toString()
             command!!.setParameters(parameters)
             println("Set " + command!!.name)
-            println(command!!.parameters)
+            println("params: " + command!!.parameters)
+            println("ParallelType: " + command!!.parallelType)
+            println("-------------------")
             return command
         }
 
