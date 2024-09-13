@@ -79,29 +79,27 @@ class AutoCommandRow() : ExpanderRow() {
             val paramName = info.parameters[i]!!.removeSurrounding("\"")
             entryRow.setTitle(paramName)
 
-            //if this is the parameters that need the names of the trajectories
-            if (App.settings.pluginsEnabled) {
-                //gets the pair from the hashmap and checks if the first element (boolean) is true,
-                // meaning the plugin was enabled, if so, pluginClass = that class, else, null
-                if (App.plugins.allowedPlugins[paramName]?.first == true) {
-                    println("$paramName plugin")
-                    val pluginComboBoxText = ComboBoxText()
-                    for (str in App.plugins.allowedPlugins[paramName]!!.second.parameterOpts) {
-                        pluginComboBoxText.append(str, str)
-                        if (str == parameter) {
-                            pluginComboBoxText.activeId = Str(str)
-                        }
-                    }
-                    val prefRow = ActionRow().also {
-                        it.addSuffix(pluginComboBoxText)
-                        it.title = Str(paramName)
-                        parametersMap[paramName] = Supplier { pluginComboBoxText.activeText }
-                        addRow(it)
-                    }
-                    continue
 
+            if (paramName == "TrajectoryDriveCommand") {
+                println("$paramName plugin")
+                val pluginComboBoxText = ComboBoxText()
+
+                for (str in trajectories) {
+                    pluginComboBoxText.append(str, str)
+                    if (str == parameter) {
+                        pluginComboBoxText.activeId = Str(str)
+                    }
                 }
+                val prefRow = ActionRow().also {
+                    it.addSuffix(pluginComboBoxText)
+                    it.title = Str(paramName)
+                    parametersMap[paramName] = Supplier { pluginComboBoxText.activeText }
+                    addRow(it)
+                }
+                continue
+
             }
+
 
             //if loading classes is turned on, check the type of the current parameter in the constructor,
             //and use a dropdown/switch/entry depending on the type
@@ -142,9 +140,29 @@ class AutoCommandRow() : ExpanderRow() {
                     parametersMap[paramName] = Supplier { Str(switch.active.toString()) }
                     continue
                 }
-                entryRow.asEditable().text = Str(parameter)
-                parametersMap[paramName] = Supplier { entryRow.asEditable().text }
-                addRow(entryRow)
+                if (paramName == "TrajectoryName") {
+                    println("$paramName plugin")
+                    val pluginComboBoxText = ComboBoxText()
+
+                    for (str in trajectories) {
+                        pluginComboBoxText.append(str, str)
+                        if (str == parameter) {
+                            pluginComboBoxText.activeId = Str(str)
+                        }
+                    }
+                    val prefRow = ActionRow().also {
+                        it.addSuffix(pluginComboBoxText)
+                        it.title = Str(paramName)
+                        parametersMap[paramName] = Supplier { pluginComboBoxText.activeText }
+                        addRow(it)
+                    }
+                    continue
+
+                } else {
+                    entryRow.asEditable().text = Str(parameter)
+                    parametersMap[paramName] = Supplier { entryRow.asEditable().text }
+                    addRow(entryRow)
+                }
             } else {
                 entryRow.asEditable().text = Str(parameter)
                 parametersMap[paramName] = Supplier { entryRow.asEditable().text }

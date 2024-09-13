@@ -37,7 +37,7 @@ object App {
     lateinit var header: HeaderBar
     lateinit var title: WindowTitle
     lateinit var settings: Settings
-    lateinit var plugins: PluginManager
+//     lateinit var plugins: PluginManager
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -80,7 +80,6 @@ object App {
         println("woah")
 
         settings = Settings()
-        plugins = PluginManager()
         header = HeaderBar()
         header.addCssClass("flat")
 
@@ -154,7 +153,7 @@ object App {
         picker.stack.amodeList = project.autoModes
         try {
             if (settings.pluginsEnabled) {
-                plugins.evalParameters()
+//                 plugins.evalParameters()
             }
         } catch (e: Error) {
            e.printStackTrace()

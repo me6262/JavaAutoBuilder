@@ -8,12 +8,15 @@ import ch.bailu.gtk.type.exception.AllocationError
 import com.sun.jna.Platform
 import frc238.App
 import frc238.App.initAutoList
+import frc238.background.RobotProject
 import org.jetbrains.kotlin.incremental.createDirectory
 import java.io.File
 
 
 private var currentProjectFolder: String? = null
 lateinit var chooser: FileChooserDialog
+
+public var trajectories = ArrayList<String>()
 fun loadFolder() {
     chooser = FileChooserDialog("Stuff", App.window, FileChooserAction.SELECT_FOLDER, "Open", ResponseType.ACCEPT)
     chooser.onResponse { responseID: Int ->
@@ -23,10 +26,23 @@ fun loadFolder() {
             println(currentProjectFolder)
             App.project.rootDirectory = currentProjectFolder!!
             App.project.loadJson()
+            //gets the names of all the .traj files and sorts them alphabetically
+            if (App.settings.pluginsEnabled) {
+
+                val dir = File(App.project.rootDirectory + RobotProject.Constants.deployDirectory + "choreo${File.separatorChar}")
+                val dirList: Array<File> = dir.listFiles()!!
+                for (child in dirList) {
+                    println(child.name)
+                    trajectories.add(child.name.replace(".traj", ""))
+                }
+                trajectories.sortBy { it }
+            }
+
             chooser.destroy()
             initAutoList()
             App.settings.projectDir = currentProjectFolder!!
             App.settings.saveSettings()
+
         }
     }
     val startPath = ch.bailu.gtk.gio.File.newForPath(Str(System.getProperty("user.home")))
