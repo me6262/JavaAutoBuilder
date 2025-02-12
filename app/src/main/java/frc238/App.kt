@@ -19,6 +19,7 @@ import ch.bailu.gtk.gtk.StyleContext
 import ch.bailu.gtk.type.Str
 import ch.bailu.gtk.type.Strs
 import frc238.background.RobotProject
+import frc238.background.Amode
 import frc238.plugins.PluginManager
 import frc238.widgets.AutoPicker
 import frc238.widgets.Settings
@@ -37,13 +38,15 @@ object App {
     lateinit var header: HeaderBar
     lateinit var title: WindowTitle
     lateinit var settings: Settings
+
+    lateinit var args: Array<String>
 //     lateinit var plugins: PluginManager
 
     @JvmStatic
     fun main(args: Array<String>) {
         // Adw.init() // This call should not be necessary if you use adw.Application instead of gtk.Application
         val theApp = Application("org.frc238.autoBuilder", ApplicationFlags.FLAGS_NONE)
-        
+        this.args = args
         /*
         FIXME This works only with compiled resources
         Compile with `glib-compile-resources` application that is part of the gtk distribution
@@ -62,7 +65,7 @@ object App {
 
         theApp.onActivate { buildUI(theApp) }
         theApp.run(args.size, Strs(args))
-        theApp.onShutdown { exitProcess(0) }
+        // theApp.onShutdown { exitProcess(0) }
         app = theApp
     }
 
@@ -91,14 +94,17 @@ object App {
         copyButton.setIconName("edit-copy-symbolic")
         copyButton.onClicked {
             
+            val amode = Amode(picker.stack.getVisibleAmode())
+            amode.name = amode.name + "_copy"
+            picker.setMode(amode)
         }
+        header.packStart(copyButton);
         
         val cssProvider = CssProvider()
         val toggleCommandFlap = Button()
         toggleCommandFlap.setIconName("sidebar-show-right-symbolic")
         toggleCommandFlap.onClicked { picker.commandSidebar.onToggleClicked() }
         header.packEnd(toggleCommandFlap)
-
 
         val menubutton = MenuButton()
         menubutton.setIconName("open-menu-symbolic")

@@ -44,6 +44,7 @@ class AutoPicker {
         }
         flap.revealFlap = true
         stack.setVisibleChildName(list.first()!!.name)
+        list
     }
 
     fun setMode(list: Amode?) {
@@ -55,4 +56,5 @@ class AutoPicker {
         flap.revealFlap = !flap.revealFlap
         App.window.present()
     }
+
 }

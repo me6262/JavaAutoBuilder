@@ -68,21 +68,23 @@ class RobotProject(var rootDirectory: String) {
 
             val name = child.name.substring(0, child.name.length - 5)
 
-            params = findPattern!!
-                    .substring(44, findPattern.length - 2)
-                    .split(", ".toRegex())
-                    .dropLastWhile { it.isEmpty() }
-                    .toTypedArray()
 
-            val paramsList: ArrayList<String?> = params.toMutableList() as ArrayList<String?>
+            var paramsList: ArrayList<String?> = ArrayList()
             var parameterTypes: Array<Class<*>?> = Array(1) { null }
             if (App.settings.classLoading) {
 
                 reloadWPILibClassLoader()
+                val auto = WPILibClassLoader.loadClass("frc.robot.autonomous.Auto") as Class<out Annotation>
                 val loadedClass = WPILibClassLoader.loadClass("frc.robot.commands.$name")
+                val parameters: ArrayList<String?> = ArrayList();
                 for (constructor in loadedClass.constructors) {
-                    if (constructor.parameterCount == params.size) {
+                    if (constructor.isAnnotationPresent(auto)) {
                         commandConstructor = constructor
+                        for (param in constructor.parameters) {
+
+                            parameters += param.name
+                        }
+                        paramsList = parameters
                     }
                 }
                 parameterTypes = commandConstructor!!.parameterTypes
@@ -160,7 +162,7 @@ class RobotProject(var rootDirectory: String) {
         val commandDirectory = "/src/main/java/frc/robot/commands/".replace('/', File.separatorChar)
         val commandsRegex = ".*/(.*).java"
         val pathFileRegex = ".*/(.*)\\.traj"
-        val autoModeAnnotationRegex = "@AutonomousModeAnnotation\\(parameterNames = \\{(.*)}\\)"
+        val autoModeAnnotationRegex = "@Auto"
     }
 
     companion object {

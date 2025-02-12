@@ -30,10 +30,14 @@ fun loadFolder() {
             if (App.settings.pluginsEnabled) {
 
                 val dir = File(App.project.rootDirectory + RobotProject.Constants.deployDirectory + "choreo${File.separatorChar}")
-                val dirList: Array<File> = dir.listFiles()!!
-                for (child in dirList) {
-                    println(child.name)
-                    trajectories.add(child.name.replace(".traj", ""))
+                val dirList: Array<File>? = dir.listFiles()
+                if (dirList != null) {
+
+                    for (child in dirList) {
+
+                        println(child.name)
+                        trajectories.add(child.name.replace(".traj", ""))
+                    }
                 }
                 trajectories.sortBy { it }
             }

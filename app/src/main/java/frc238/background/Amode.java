@@ -19,4 +19,11 @@ public class Amode {
     public void setCommands(List<AmodeCommand> val){
         commands = val;
     }
+    
+    public Amode(Amode mode) {
+        setName(mode.name);
+        setCommands(mode.commands);
+    }
+
+    public Amode() {}
 }

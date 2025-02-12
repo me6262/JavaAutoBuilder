@@ -54,6 +54,10 @@ class AmodeStack : Stack() {
         }
     }
 
+    fun getVisibleAmode() : Amode {
+        return editorWidgetSupplier[visibleChild.name.toString()]!!.updatedMode
+    }
+
     private fun moveFocusedCommandDown() {
         editorWidgetSupplier[visibleChild.name.toString()]!!.moveRowDown()
     }
