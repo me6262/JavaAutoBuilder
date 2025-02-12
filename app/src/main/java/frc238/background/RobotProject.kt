@@ -19,6 +19,11 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.collections.ArrayList
+import kotlin.collections.orEmpty
+import kotlin.collections.asList
+import kotlin.arrayOf
+import kotlin.io.println
 
 class RobotProject(var rootDirectory: String) {
     private val mapper: ObjectMapper = ObjectMapper()
@@ -67,24 +72,52 @@ class RobotProject(var rootDirectory: String) {
             if (!foundAnnotation) continue
 
             val name = child.name.substring(0, child.name.length - 5)
+            //@Auto(name = {})
+            if (findPattern!!.contains("name")) {
+                println(findPattern)
 
+                params = findPattern
+                .substring(15, findPattern.length - 2)
+                .split(", ".toRegex())
+                .dropLastWhile { it.isEmpty() }
+                .toTypedArray()
+                .map { 
+                    it.removeSurrounding("\"")
+                }
+                .toTypedArray()
+            } else {
+                params = arrayOf<String?>()
+            }
+            
 
-            var paramsList: ArrayList<String?> = ArrayList()
+            var paramsList: ArrayList<String?> = params.toMutableList() as ArrayList<String?>
             var parameterTypes: Array<Class<*>?> = Array(1) { null }
+            // here begins the lovely process of using so much reflection it makes my nose bleed
+            // we pretty much grab the .jar file of compiled code in the build directory of the robot project,
+            // and load the current command, check for the annotated constructor, and get the types for each of its parameters for later use
             if (App.settings.classLoading) {
 
                 reloadWPILibClassLoader()
+                
                 val auto = WPILibClassLoader.loadClass("frc.robot.autonomous.Auto") as Class<out Annotation>
+
                 val loadedClass = WPILibClassLoader.loadClass("frc.robot.commands.$name")
-                val parameters: ArrayList<String?> = ArrayList();
+                var parameters: ArrayList<String?> = ArrayList();
+                // looks through all possible constructors in the class for the annotated one
                 for (constructor in loadedClass.constructors) {
                     if (constructor.isAnnotationPresent(auto)) {
+                        
                         commandConstructor = constructor
-                        for (param in constructor.parameters) {
-
-                            parameters += param.name
+                        
+                        //this snippet gets the name of each parameter directly from the annotation to get around regex formatting difficulties
+                        //gets the string array in the annotation, checks its length, and if it's greater than 0, we add them all to the parameters variable
+                        //I am trapped in a reflection hell of my own design
+                        //help me please
+                        val names = auto.getMethod("names").invoke(constructor.getAnnotation(auto)) as Array<String?>
+                        if (names.size > 0) {
+                            names.mapTo(parameters) { it }
+                            paramsList = parameters
                         }
-                        paramsList = parameters
                     }
                 }
                 parameterTypes = commandConstructor!!.parameterTypes
@@ -110,7 +143,7 @@ class RobotProject(var rootDirectory: String) {
             if (!File(rootDirectory + Constants.deployDirectory + Constants.amodeFile).exists()) {
                 val amode = File(rootDirectory + Constants.deployDirectory + Constants.amodeFile)
                 amode.createNewFile()
-                amode.writeText("{\"autoModes\":[]}")
+                amode.writeText("{\"autonomousModes\":[]}")
                 amode.readText()
             } else {
                 null
@@ -162,7 +195,7 @@ class RobotProject(var rootDirectory: String) {
         val commandDirectory = "/src/main/java/frc/robot/commands/".replace('/', File.separatorChar)
         val commandsRegex = ".*/(.*).java"
         val pathFileRegex = ".*/(.*)\\.traj"
-        val autoModeAnnotationRegex = "@Auto"
+        val autoModeAnnotationRegex = "@Auto.*"
     }
 
     companion object {

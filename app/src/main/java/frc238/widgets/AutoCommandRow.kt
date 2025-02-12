@@ -114,7 +114,7 @@ class AutoCommandRow() : ExpanderRow() {
                             enumBoxText.active = (enumeration as Enum<*>).ordinal
                             continue
                         }
-                        if (enumeration.toString() == parameter.uppercase()) {
+                        if (enumeration.toString() == parameter) {
                             enumBoxText.active = (enumeration as Enum<*>).ordinal
                         }
                     }
