@@ -25,7 +25,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
 
     // This dependency is used by the application.
-    implementation("com.github.bailuk:java-gtk:0.4.0")
+    implementation("com.github.bailuk:java-gtk:0.5.0")
     implementation("com.google.guava:guava:31.1-jre")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
     implementation("com.googlecode.json-simple:json-simple:1.1.1")

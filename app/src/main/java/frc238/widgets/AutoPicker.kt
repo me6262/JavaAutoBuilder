@@ -32,7 +32,6 @@ class AutoPicker {
             content = commandSidebar
             swipeToClose = true
             swipeToOpen = true
-            swipeToOpen
         }
         sidebar!!.stack = stack
         commandSidebar.content = stack

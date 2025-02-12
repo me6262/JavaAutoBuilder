@@ -43,7 +43,7 @@ object App {
     fun main(args: Array<String>) {
         // Adw.init() // This call should not be necessary if you use adw.Application instead of gtk.Application
         val theApp = Application("org.frc238.autoBuilder", ApplicationFlags.FLAGS_NONE)
-
+        
         /*
         FIXME This works only with compiled resources
         Compile with `glib-compile-resources` application that is part of the gtk distribution
@@ -87,11 +87,18 @@ object App {
         picker = AutoPicker()
         title = WindowTitle("Autonomous Builder", "")
         header.titleWidget = title
+        val copyButton = Button()
+        copyButton.setIconName("edit-copy-symbolic")
+        copyButton.onClicked {
+            
+        }
+        
         val cssProvider = CssProvider()
         val toggleCommandFlap = Button()
         toggleCommandFlap.setIconName("sidebar-show-right-symbolic")
         toggleCommandFlap.onClicked { picker.commandSidebar.onToggleClicked() }
         header.packEnd(toggleCommandFlap)
+
 
         val menubutton = MenuButton()
         menubutton.setIconName("open-menu-symbolic")
@@ -142,7 +149,7 @@ object App {
         hbox.append(picker.flap)
         vbox.append(header)
         vbox.append(hbox)
-        window.setDefaultSize(900, 800)
+        window.setDefaultSize(1000, 800)
         window.content = vbox
         window.present()
     }
