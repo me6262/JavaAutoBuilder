@@ -29,7 +29,7 @@ the easiest method to get them without building gtk yourself is using msys2.
 2. open MinGW64.exe and run this:
 
 ```bash
-pacman -S mingw-w64-x86_64-gtk4 mingw-w64-adwaita-icon-theme mingw-w64-libadwaita
+pacman -S mingw-w64-x86_64-gtk4 mingw-w64--x86_64-adwaita-icon-theme mingw-w64-x86_64-libadwaita
 ```
 
 3. then add the `bin`, `lib` and `include` directories of the msys2 install directory to your windows path
